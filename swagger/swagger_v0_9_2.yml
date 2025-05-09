@@ -1,0 +1,5723 @@
+openapi: 3.0.0
+paths:
+  /api/v1/health:
+    get:
+      operationId: AppController_health
+      summary: ヘルスチェック
+      description: ヘルスチェック
+      parameters: []
+      responses:
+        '200':
+          description: Return status.
+      tags:
+        - health
+  /api/v1/users:
+    get:
+      operationId: UsersController_findAll
+      summary: ユーザーアカウント一覧取得
+      description: ユーザーアカウントを一覧として値を返します。
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: '(必須) ページネーションを表示する際のページ数に当たるクエリパラメーター。全件取得する際は1を指定。(デフォルト: 1)'
+          schema:
+            example: 1
+            type: number
+        - name: limit
+          required: false
+          in: query
+          description: >-
+            (必須)
+            ページネーションを表示する際のページ数あたりに表示する件数を指定するクエリパラメーター。全件取得する際は0を指定。(デフォルト: 10)
+          schema:
+            example: 10
+            type: number
+        - name: name
+          required: false
+          in: query
+          description: '(任意) 例: "Jhon Doe"'
+          schema:
+            type: string
+        - name: email
+          required: false
+          in: query
+          description: '(任意) 例: "client1@email.com"'
+          schema:
+            type: string
+        - name: status
+          required: false
+          in: query
+          description: '(任意) 例: "active"'
+          schema:
+            enum:
+              - inactive
+              - activating
+              - active
+              - deactive
+            type: string
+        - name: role
+          required: false
+          in: query
+          description: '(任意) 例: "client"'
+          schema:
+            enum:
+              - admin
+              - user
+              - client
+            type: string
+        - name: needActivateFlow
+          required: false
+          in: query
+          description: '(任意) 例: true, false'
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Return all users.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersResponseDto'
+        '401':
+          description: 'Error: Unauthorized.'
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+                statusCode: 401
+        '403':
+          description: 'Error: Forbidden.'
+          content:
+            application/json:
+              example:
+                message: Forbidden
+                statusCode: 403
+        '500':
+          description: 'Error: Internal Server Error'
+          content:
+            application/json:
+              example:
+                statusCode: 500
+                message: Internal server error
+      tags:
+        - users
+      security:
+        - bearer: []
+    post:
+      operationId: UsersController_create
+      summary: ユーザーアカウント作成
+      description: 新規ユーザーアカウントを作成します。
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '201':
+          description: The users has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+        '400':
+          description: 'Error: Bad request'
+          content:
+            application/json:
+              example:
+                message: User create failed.
+                error: User create failed.
+                statusCode: 400
+        '401':
+          description: 'Error: Unauthorized.'
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+                statusCode: 401
+        '403':
+          description: 'Error: Forbidden.'
+          content:
+            application/json:
+              example:
+                message: Forbidden
+                statusCode: 403
+        '500':
+          description: 'Error: Internal Server Error'
+          content:
+            application/json:
+              example:
+                statusCode: 500
+                message: Internal server error
+      tags:
+        - users
+      security:
+        - bearer: []
+  /api/v1/users/{id}:
+    get:
+      operationId: UsersController_findOne
+      summary: ユーザーアカウント詳細取得
+      description: リクエストパラメータのidで指定された単一の管理者アカウントの詳細情報の値を返します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return a single user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+        '401':
+          description: 'Error: Unauthorized.'
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+                statusCode: 401
+        '403':
+          description: 'Error: Forbidden.'
+          content:
+            application/json:
+              example:
+                message: Forbidden
+                statusCode: 403
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              example:
+                message: Not Found
+                statusCode: 404
+        '500':
+          description: 'Error: Internal Server Error'
+          content:
+            application/json:
+              example:
+                statusCode: 500
+                message: Internal server error
+      tags:
+        - users
+      security:
+        - bearer: []
+    put:
+      operationId: UsersController_update
+      summary: ユーザーアカウント更新
+      description: リクエストパラメータのidで指定された単一のユーザーアカウント情報を更新します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '201':
+          description: The user has been successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+        '401':
+          description: 'Error: Unauthorized.'
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+                statusCode: 401
+        '403':
+          description: 'Error: Forbidden.'
+          content:
+            application/json:
+              example:
+                message: Forbidden
+                statusCode: 403
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              example:
+                message: Not Found
+                statusCode: 404
+        '500':
+          description: 'Error: Internal Server Error'
+          content:
+            application/json:
+              example:
+                statusCode: 500
+                message: Internal server error
+      tags:
+        - users
+      security:
+        - bearer: []
+    delete:
+      operationId: UsersController_remove
+      summary: ユーザーアカウント停止
+      description: リクエストパラメータのidで指定された単一のユーザーアカウントを停止します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The user has been successfully deleted.
+        '401':
+          description: 'Error: Unauthorized.'
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+                statusCode: 401
+        '403':
+          description: 'Error: Forbidden.'
+          content:
+            application/json:
+              example:
+                message: Forbidden
+                statusCode: 403
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              example:
+                message: Not Found
+                statusCode: 404
+        '500':
+          description: 'Error: Internal Server Error'
+          content:
+            application/json:
+              example:
+                statusCode: 500
+                message: Internal server error
+      tags:
+        - users
+      security:
+        - bearer: []
+  /api/v1/users/{id}/dids:
+    post:
+      operationId: UsersController_registerUserDid
+      summary: Get the count of clients
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateDidDto'
+      responses:
+        '200':
+          description: Return the count of clients.
+        '401':
+          description: 'Error: Unauthorized.'
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+                statusCode: 401
+        '403':
+          description: 'Error: Forbidden.'
+          content:
+            application/json:
+              example:
+                message: Forbidden
+                statusCode: 403
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              example:
+                message: Not Found
+                statusCode: 404
+        '500':
+          description: 'Error: Internal Server Error'
+          content:
+            application/json:
+              example:
+                statusCode: 500
+                message: Internal server error
+      tags:
+        - users
+      security:
+        - bearer: []
+  /api/v1/users/{id}/dids/{didInfoId}/mail:
+    post:
+      operationId: UsersController_sendDid
+      summary: アカウントへのDIDのメール送信
+      description: アカウントに紐付いたDIDをメールで送信し、共有します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: didInfoId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return the count of users.
+        '401':
+          description: 'Error: Unauthorized.'
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+                statusCode: 401
+        '403':
+          description: 'Error: Forbidden.'
+          content:
+            application/json:
+              example:
+                message: Forbidden
+                statusCode: 403
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              example:
+                message: Not Found
+                statusCode: 404
+        '500':
+          description: 'Error: Internal Server Error'
+          content:
+            application/json:
+              example:
+                statusCode: 500
+                message: Internal server error
+      tags:
+        - users
+      security:
+        - bearer: []
+  /api/v1/users/{id}/keys/{keyId}/mail:
+    post:
+      operationId: UsersController_exportKey
+      summary: アカウントへの鍵のメール送信
+      description: クライアントアカウントに紐付いたDIDの鍵情報をメールで送信し、共有します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: keyId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return the count of clients.
+        '401':
+          description: 'Error: Unauthorized.'
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+                statusCode: 401
+        '403':
+          description: 'Error: Forbidden.'
+          content:
+            application/json:
+              example:
+                message: Forbidden
+                statusCode: 403
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              example:
+                message: Not Found
+                statusCode: 404
+        '500':
+          description: 'Error: Internal Server Error'
+          content:
+            application/json:
+              example:
+                statusCode: 500
+                message: Internal server error
+      tags:
+        - users
+      security:
+        - bearer: []
+  /api/v1/users/{id}/keys/{didInfoId}/mail:
+    post:
+      operationId: UsersController_sendKey
+      summary: アカウントへのDIDのメール送信
+      description: アカウントに紐付いたDIDをメールで送信し、共有します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: didInfoId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return the count of clients.
+        '401':
+          description: 'Error: Unauthorized.'
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+                statusCode: 401
+        '403':
+          description: 'Error: Forbidden.'
+          content:
+            application/json:
+              example:
+                message: Forbidden
+                statusCode: 403
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              example:
+                message: Not Found
+                statusCode: 404
+        '500':
+          description: 'Error: Internal Server Error'
+          content:
+            application/json:
+              example:
+                statusCode: 500
+                message: Internal server error
+      tags:
+        - users
+      security:
+        - bearer: []
+  /api/v1/users/{id}/vcs/{vcInfoId}/mail:
+    post:
+      operationId: UsersController_sendVc
+      summary: アカウントへのVCのメール送信
+      description: アカウントに紐付いたVCをメールで送信し、共有します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: vcInfoId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return the count of clients.
+        '401':
+          description: 'Error: Unauthorized.'
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+                statusCode: 401
+        '403':
+          description: 'Error: Forbidden.'
+          content:
+            application/json:
+              example:
+                message: Forbidden
+                statusCode: 403
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              example:
+                message: Not Found
+                statusCode: 404
+        '500':
+          description: 'Error: Internal Server Error'
+          content:
+            application/json:
+              example:
+                statusCode: 500
+                message: Internal server error
+      tags:
+        - users
+      security:
+        - bearer: []
+  /api/v1/users/{id}/invite:
+    post:
+      operationId: UsersController_invite
+      summary: ユーザーアカウントへのアカウント有効化メール送信
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return all students.
+        '401':
+          description: 'Error: Unauthorized.'
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+                statusCode: 401
+        '403':
+          description: 'Error: Forbidden.'
+          content:
+            application/json:
+              example:
+                message: Forbidden
+                statusCode: 403
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              example:
+                message: Not Found
+                statusCode: 404
+        '500':
+          description: 'Error: Internal Server Error'
+          content:
+            application/json:
+              example:
+                statusCode: 500
+                message: Internal server error
+      tags:
+        - users
+      security:
+        - bearer: []
+  /api/v1/users/registration:
+    post:
+      operationId: UsersController_registration
+      summary: ユーザーアカウントへのアカウント有効化、登録フロー
+      parameters:
+        - name: token
+          required: true
+          in: query
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationProcessDto'
+      responses:
+        '200':
+          description: Return all students.
+        '401':
+          description: 'Error: Unauthorized.'
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+                statusCode: 401
+        '403':
+          description: 'Error: Forbidden.'
+          content:
+            application/json:
+              example:
+                message: Forbidden
+                statusCode: 403
+        '404':
+          description: 'Error: Not Found'
+          content:
+            application/json:
+              example:
+                message: Not Found
+                statusCode: 404
+        '500':
+          description: 'Error: Internal Server Error'
+          content:
+            application/json:
+              example:
+                statusCode: 500
+                message: Internal server error
+      tags:
+        - users
+      security:
+        - bearer: []
+  /api/v1/groups:
+    get:
+      operationId: GroupsController_findAll
+      summary: グループ一覧取得
+      description: グループを一覧として値を返します。
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: '(必須) ページネーションを表示する際のページ数に当たるクエリパラメーター。全件取得する際は1を指定。(デフォルト: 1)'
+          schema:
+            example: 1
+            type: number
+        - name: limit
+          required: false
+          in: query
+          description: >-
+            (必須)
+            ページネーションを表示する際のページ数あたりに表示する件数を指定するクエリパラメーター。全件取得する際は0を指定。(デフォルト: 10)
+          schema:
+            example: 10
+            type: number
+        - name: name
+          required: false
+          in: query
+          description: '(任意)グループの名前。 例: "Group Project1"'
+          schema:
+            type: string
+        - name: status
+          required: false
+          in: query
+          description: '(任意)グループのステータス。 例: "active"'
+          schema:
+            enum:
+              - active
+              - deactive
+            type: string
+      responses:
+        '200':
+          description: Return all groups.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupsResponseDto'
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - groups
+      security:
+        - bearer: []
+    post:
+      operationId: GroupsController_create
+      summary: グループ作成
+      description: グループ作成に成功しました。
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGroupDto'
+      responses:
+        '201':
+          description: The group has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponseDto'
+        '400':
+          description: Bad request, entity already exists or invalid data
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - groups
+      security:
+        - bearer: []
+  /api/v1/groups/{id}:
+    get:
+      operationId: GroupsController_findOne
+      summary: グループ詳細取得
+      description: リクエストパラメータのidで指定された単一の管理者アカウントの詳細情報の値を返します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return a single group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponseDto'
+        '400':
+          description: Invalid input
+        '403':
+          description: Forbidden.
+        '404':
+          description: Entity not found
+        '500':
+          description: Internal server error
+      tags:
+        - groups
+      security:
+        - bearer: []
+    put:
+      operationId: GroupsController_update
+      summary: グループ更新
+      description: リクエストパラメータのidで指定された単一のグループ情報を更新します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The group has been successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponseDto'
+        '403':
+          description: Forbidden.
+        '404':
+          description: Entity not found
+        '500':
+          description: Internal server error
+      tags:
+        - groups
+      security:
+        - bearer: []
+    delete:
+      operationId: GroupsController_remove
+      summary: グループ停止
+      description: リクエストパラメータのidで指定された単一のグループを停止します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The group has been successfully deleted.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Group not found
+        '500':
+          description: Internal server error
+      tags:
+        - groups
+      security:
+        - bearer: []
+  /api/v1/groups/{id}/users:
+    put:
+      operationId: GroupsController_connectUsers
+      summary: グループへのユーザーアカウント紐付け
+      description: グループの所有者、関係者などの管理者としてユーザーアカウントを紐付けます。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectUsersDto'
+      responses:
+        '201':
+          description: The group has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponseDto'
+        '403':
+          description: Forbidden.
+        '404':
+          description: Group not found
+        '500':
+          description: Internal server error
+      tags:
+        - groups
+      security:
+        - bearer: []
+  /api/v1/groups/{id}/user/{user_id}:
+    delete:
+      operationId: GroupsController_disconnectUser
+      summary: グループのユーザーアカウント紐付け解除
+      description: グループに紐付いたユーザーアカウントの紐付けを解除します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: user_id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The group has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponseDto'
+        '403':
+          description: Forbidden.
+        '404':
+          description: Group not found
+        '500':
+          description: Internal server error
+      tags:
+        - groups
+      security:
+        - bearer: []
+  /api/v1/groups/{id}/vc-schemas:
+    put:
+      operationId: GroupsController_connectVcSchema
+      summary: グループへのVCスキーマ紐付け
+      description: グループにVCスキーマを紐付けます。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectVcSchemasDto'
+      responses:
+        '201':
+          description: The group has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponseDto'
+        '403':
+          description: Forbidden.
+        '404':
+          description: Group not found
+        '500':
+          description: Internal server error
+      tags:
+        - groups
+      security:
+        - bearer: []
+  /api/v1/groups/{id}/vc-schema/{vc_schema_id}:
+    delete:
+      operationId: GroupsController_disconnectVcSchema
+      summary: グループのVCスキーマ紐付け解除
+      description: グループに紐付いたVCスキーマの紐付けを解除します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: vc_schema_id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The group has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponseDto'
+        '403':
+          description: Forbidden.
+        '404':
+          description: Group not found
+        '500':
+          description: Internal server error
+      tags:
+        - groups
+      security:
+        - bearer: []
+  /api/v1/groups/{id}/did-infos:
+    put:
+      operationId: GroupsController_connectDidInfos
+      summary: グループへのDID情報紐付け
+      description: グループにDID情報を紐付けます。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectDidInfosDto'
+      responses:
+        '201':
+          description: The group has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponseDto'
+        '403':
+          description: Forbidden.
+        '404':
+          description: Group not found
+        '500':
+          description: Internal server error
+      tags:
+        - groups
+      security:
+        - bearer: []
+  /api/v1/groups/{id}/did-info/{did_info_id}:
+    delete:
+      operationId: GroupsController_disconnectDidInfo
+      summary: グループのDID情報紐付け解除
+      description: グループに紐付いたDID情報の紐付けを解除します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: did_info_id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The group has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponseDto'
+        '403':
+          description: Forbidden.
+        '404':
+          description: Group not found
+        '500':
+          description: Internal server error
+      tags:
+        - groups
+      security:
+        - bearer: []
+  /api/v1/groups/{id}/vc-infos:
+    put:
+      operationId: GroupsController_connectVcInfos
+      summary: グループへのVC情報紐付け
+      description: グループにVC情報を紐付けます。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectVcInfosDto'
+      responses:
+        '201':
+          description: The group has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponseDto'
+        '403':
+          description: Forbidden.
+        '404':
+          description: Group not found
+        '500':
+          description: Internal server error
+      tags:
+        - groups
+      security:
+        - bearer: []
+  /api/v1/groups/{id}/vc-info/{vc_info_id}:
+    delete:
+      operationId: GroupsController_disconnectVcInfo
+      summary: グループのVC情報紐付け解除
+      description: グループに紐付いたVC情報の紐付けを解除します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: vc_info_id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The group has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponseDto'
+        '403':
+          description: Forbidden.
+        '404':
+          description: Group not found
+        '500':
+          description: Internal server error
+      tags:
+        - groups
+      security:
+        - bearer: []
+  /api/v1/groups/{id}/vp-infos:
+    put:
+      operationId: GroupsController_connectVpInfos
+      summary: グループへのVP情報紐付け
+      description: グループにVP情報を紐付けます。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectVpInfosDto'
+      responses:
+        '201':
+          description: The group has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponseDto'
+        '403':
+          description: Forbidden.
+        '404':
+          description: Group not found
+        '500':
+          description: Internal server error
+      tags:
+        - groups
+      security:
+        - bearer: []
+  /api/v1/groups/{id}/vp-info/{vp_info_id}:
+    delete:
+      operationId: GroupsController_disconnectVpInfo
+      summary: グループのVP情報紐付け解除
+      description: グループに紐付いたVP情報の紐付けを解除します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: vp_info_id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The group has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponseDto'
+        '403':
+          description: Forbidden.
+        '404':
+          description: Group not found
+        '500':
+          description: Internal server error
+      tags:
+        - groups
+      security:
+        - bearer: []
+  /api/v1/vc-infos:
+    get:
+      operationId: VcInfosController_findAll
+      summary: VC情報一覧取得
+      description: アプリケーションが管理するVC情報を一覧として値を返します。
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: '(必須) ページネーションを表示する際のページ数に当たるクエリパラメーター。全件取得する際は1を指定。(デフォルト: 1)'
+          schema:
+            example: 1
+            type: number
+        - name: limit
+          required: false
+          in: query
+          description: >-
+            (必須)
+            ページネーションを表示する際のページ数あたりに表示する件数を指定するクエリパラメーター。全件取得する際は0を指定。(デフォルト: 10)
+          schema:
+            example: 10
+            type: number
+        - name: label
+          required: false
+          in: query
+          description: '(任意) 例: "vc-for-project1"'
+          schema:
+            type: string
+        - name: description
+          required: false
+          in: query
+          description: '(任意) '
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return all VcInfos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VcInfosResponseDto'
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - vc-infos
+      security:
+        - bearer: []
+    post:
+      operationId: VcInfosController_create
+      summary: 新規VC発行
+      description: 新規VCを発行します。
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVcInfoDto'
+      responses:
+        '201':
+          description: The VcInfos has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VcInfoResponseDto'
+        '400':
+          description: Bad request, entity already exists or invalid data
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - vc-infos
+      security:
+        - bearer: []
+  /api/v1/vc-infos/issue:
+    post:
+      operationId: VcInfosController_issue
+      summary: 新規VC発行(スキーマなし)
+      description: VCスキーマを指定せず直接新規VCを発行します。
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueVcInfoDto'
+      responses:
+        '201':
+          description: The VcInfos has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VcInfoResponseDto'
+        '400':
+          description: Bad request, entity already exists or invalid data
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - vc-infos
+      security:
+        - bearer: []
+  /api/v1/vc-infos/upload:
+    post:
+      operationId: VcInfosController_upload
+      summary: 新規VCアップロード
+      description: 外部で発行された既存VCをアップロードし、本アプリケーションに保存します。。
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadVCDto'
+      responses:
+        '201':
+          description: The VcInfo has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VcInfoResponseDto'
+        '400':
+          description: Bad request, entity already exists or invalid data
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - vc-infos
+      security:
+        - bearer: []
+  /api/v1/vc-infos/{id}:
+    get:
+      operationId: VcInfosController_findOne
+      summary: VC情報詳細取得
+      description: リクエストパラメータのidで指定された単一のVC情報の詳細情報の値を返します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return a single VcInfo.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VcInfoResponseDto'
+        '400':
+          description: Invalid input
+        '403':
+          description: Forbidden.
+        '404':
+          description: Entity not found
+        '500':
+          description: Internal server error
+      tags:
+        - vc-infos
+      security:
+        - bearer: []
+    put:
+      operationId: VcInfosController_connectUser
+      summary: VC情報へのクライアントアカウント紐付け
+      description: VC情報の所有者、関係者などの管理者としてクライアントアカウントを紐付けます。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVcInfoDto'
+      responses:
+        '201':
+          description: The VcInfo has been successfully updated.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Entity not found
+        '500':
+          description: Internal server error
+      tags:
+        - vc-infos
+      security:
+        - bearer: []
+    post:
+      operationId: VcInfosController_generateVp
+      summary: 新規VP情報生成
+      description: リクエストパラメータのidで指定されたVC情報から新規VPを発行します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateVpDto'
+      responses:
+        '201':
+          description: The VpInfo has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VcInfoResponseDto'
+        '400':
+          description: Bad request, entity already exists or invalid data
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - vc-infos
+      security:
+        - bearer: []
+  /api/v1/vc-infos/{id}/label:
+    put:
+      operationId: VcInfosController_addLabel
+      summary: VC情報へのラベル追加
+      description: リクエストパラメータのidで指定された単一のVC情報に対して、任意の管理用ラベルを追加します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddLabelToVcInfoDto'
+      responses:
+        '201':
+          description: The VcInfo has been successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VcInfoResponseDto'
+        '403':
+          description: Forbidden.
+        '404':
+          description: VcINfo not found
+        '500':
+          description: Internal server error
+      tags:
+        - vc-infos
+      security:
+        - bearer: []
+  /api/v1/vc-infos/{id}/user:
+    delete:
+      operationId: VcInfosController_disconnectUser
+      summary: VC情報のクライアントアカウント紐付け解除
+      description: VC情報に紐付いたクライアントアカウントの紐付けを解除します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The VcInfo has been successfully deleted.
+        '403':
+          description: Forbidden.
+        '404':
+          description: VcInfo not found
+        '500':
+          description: Internal server error
+      tags:
+        - vc-infos
+      security:
+        - bearer: []
+  /api/v1/did-infos:
+    get:
+      operationId: DidInfosController_findAll
+      summary: DID情報一覧取得
+      description: アプリケーションが管理するDID情報を一覧として値を返します。
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: '(必須) ページネーションを表示する際のページ数に当たるクエリパラメーター。全件取得する際は1を指定。(デフォルト: 1)'
+          schema:
+            example: 1
+            type: number
+        - name: limit
+          required: false
+          in: query
+          description: >-
+            (必須)
+            ページネーションを表示する際のページ数あたりに表示する件数を指定するクエリパラメーター。全件取得する際は0を指定。(デフォルト: 10)
+          schema:
+            example: 10
+            type: number
+        - name: did
+          required: false
+          in: query
+          description: '(任意) 例: "did:key:z6MkhGeGj7u5htkCYjE4PaQ8HUqjYyTmxpDb6Q1MqUpUDsN7"'
+          schema:
+            type: string
+        - name: manageUuid
+          required: false
+          in: query
+          description: '(任意) 例: "32bad62a-4186-4d04-a26a-fcee79d5824b"'
+          schema:
+            type: string
+        - name: label
+          required: false
+          in: query
+          description: '(任意) 例: "did-for-project1"'
+          schema:
+            type: string
+        - name: method
+          required: false
+          in: query
+          description: '(任意) 例: "did:key'
+          schema:
+            enum:
+              - key
+              - web
+              - ethr
+              - ethr:arbitrum:goerli
+              - ethr:sepolia
+            type: string
+        - name: existPrivateKey
+          required: false
+          in: query
+          description: '(任意) 例: true'
+          schema:
+            type: boolean
+        - name: description
+          required: false
+          in: query
+          description: '(任意) '
+          schema:
+            type: string
+        - name: domainName
+          required: false
+          in: query
+          description: '(任意) 例: "did:web:idroit-dashboard.com"'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return all DidInfos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DidInfosResponseDto'
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal server error
+      tags:
+        - did-infos
+      security:
+        - bearer: []
+    post:
+      operationId: DidInfosController_create
+      summary: 新規DID生成
+      description: 新規DIDを生成します。
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDidDto'
+      responses:
+        '201':
+          description: The DidInfo has been successfully created.
+        '400':
+          description: Bad request, entity already exists or invalid data
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - did-infos
+      security:
+        - bearer: []
+  /api/v1/did-infos/register:
+    post:
+      operationId: DidInfosController_register
+      summary: 既存DID登録
+      description: 外部で生成されたDIDを本アプリケーションに取り込みます。
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterDidDto'
+      responses:
+        '201':
+          description: The DidInfo has been successfully created.
+        '400':
+          description: Bad request, entity already exists or invalid data
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - did-infos
+      security:
+        - bearer: []
+  /api/v1/did-infos/{id}:
+    get:
+      operationId: DidInfosController_findOne
+      summary: DID情報詳細取得
+      description: リクエストパラメータのidで指定された単一のDID情報の詳細情報の値を返します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return a single DidInfo.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DidInfoResponseDto'
+        '400':
+          description: Invalid input
+        '403':
+          description: Forbidden.
+        '404':
+          description: Entity not found
+        '500':
+          description: Internal server error
+      tags:
+        - did-infos
+      security:
+        - bearer: []
+    delete:
+      operationId: DidInfosController_remove
+      summary: DID情報削除
+      description: リクエストパラメータのidで指定された単一のDID情報を削除します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The DidInfo has been successfully deleted.
+        '403':
+          description: Forbidden.
+        '404':
+          description: DidInfo not found
+        '500':
+          description: Internal server error
+      tags:
+        - did-infos
+      security:
+        - bearer: []
+    put:
+      operationId: DidInfosController_addLabel
+      summary: DID情報へのラベル追加
+      description: リクエストパラメータのidで指定された単一のDID情報に対して、任意の管理用ラベルを追加します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddLabelToDidInfoDto'
+      responses:
+        '201':
+          description: The DidInfo has been successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DidInfoResponseDto'
+        '403':
+          description: Forbidden.
+        '404':
+          description: DidInfo not found
+        '500':
+          description: Internal server error
+      tags:
+        - did-infos
+      security:
+        - bearer: []
+  /api/v1/did-infos/resolver:
+    post:
+      operationId: DidInfosController_resolve
+      summary: DID解決
+      description: >-
+        DIDを解決した結果であるDID
+        Documentの値を返します。このAPIでは保存などの処理を行いません。生成済みのDIDを保存したい場合、既存DID登録API(/did-infos/register)にリクエストを送信してください。
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResolveDidDto'
+      responses:
+        '200':
+          description: Return a single DidInfo.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResolveDidResponseDto'
+        '400':
+          description: Invalid input
+        '403':
+          description: Forbidden.
+        '404':
+          description: Entity not found
+        '500':
+          description: Internal server error
+      tags:
+        - did-infos
+      security:
+        - bearer: []
+  /api/v1/did-infos/{id}/user/{user_id}:
+    put:
+      operationId: DidInfosController_connectUser
+      summary: DID情報へのクライアントアカウント紐付け
+      description: DID情報の所有者、関係者などの管理者としてクライアントアカウントを紐付けます。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: user_id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return a single DidInfo.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DidInfoResponseDto'
+        '400':
+          description: Invalid input
+        '403':
+          description: Forbidden.
+        '404':
+          description: Entity not found
+        '500':
+          description: Internal server error
+      tags:
+        - did-infos
+      security:
+        - bearer: []
+  /api/v1/did-infos/{id}/user:
+    delete:
+      operationId: DidInfosController_disconnectUser
+      summary: DID情報のクライアントアカウント紐付け解除
+      description: DID情報に紐付いたクライアントアカウントの紐付けを解除します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The DidInfo has been successfully deleted.
+        '403':
+          description: Forbidden.
+        '404':
+          description: DidInfo not found
+        '500':
+          description: Internal server error
+      tags:
+        - did-infos
+      security:
+        - bearer: []
+  /api/v1/mails:
+    get:
+      operationId: MailsController_findAll
+      summary: 送信済みメール一覧取得
+      description: 送信済みメールを一覧として値を返します。
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: '(必須) ページネーションを表示する際のページ数に当たるクエリパラメーター。全件取得する際は1を指定。(デフォルト: 1)'
+          schema:
+            example: 1
+            type: number
+        - name: limit
+          required: false
+          in: query
+          description: >-
+            (必須)
+            ページネーションを表示する際のページ数あたりに表示する件数を指定するクエリパラメーター。全件取得する際は0を指定。(デフォルト: 10)
+          schema:
+            example: 10
+            type: number
+      responses:
+        '200':
+          description: Return all mails.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailsResponseDto'
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - mails
+      security:
+        - bearer: []
+    post:
+      operationId: MailsController_send
+      summary: 新規単一メール送信
+      description: 新規単一メールを作成し、送信します。
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMailDto'
+      responses:
+        '201':
+          description: The mail has been successfully created and sent.
+        '400':
+          description: Bad request, entity already exists or invalid data
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - mails
+      security:
+        - bearer: []
+  /api/v1/mails/{id}:
+    get:
+      operationId: MailsController_findOne
+      summary: 送信済みメール詳細取得
+      description: リクエストパラメータのidで指定された単一の送信済みメールの詳細情報の値を返します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return a single mail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mail'
+        '400':
+          description: Invalid input
+        '403':
+          description: Forbidden.
+        '404':
+          description: Entity not found
+        '500':
+          description: Internal server error
+      tags:
+        - mails
+      security:
+        - bearer: []
+  /api/v1/mails/batch:
+    post:
+      operationId: MailsController_sendBatch
+      summary: 新規複数メールバッチ送信
+      description: 新規メールを複数作成し、送信します。
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMailBatchDto'
+      responses:
+        '201':
+          description: The mail has been successfully created.
+        '400':
+          description: Bad request, entity already exists or invalid data
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - mails
+      security:
+        - bearer: []
+  /api/v1/vc-schemas:
+    get:
+      operationId: VcSchemasController_findAll
+      summary: VCスキーマ一覧取得
+      description: VCスキーマを一覧として値を返します。
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: '(必須) ページネーションを表示する際のページ数に当たるクエリパラメーター。全件取得する際は1を指定。(デフォルト: 1)'
+          schema:
+            example: 1
+            type: number
+        - name: limit
+          required: false
+          in: query
+          description: >-
+            (必須)
+            ページネーションを表示する際のページ数あたりに表示する件数を指定するクエリパラメーター。全件取得する際は0を指定。(デフォルト: 10)
+          schema:
+            example: 10
+            type: number
+        - name: title
+          required: false
+          in: query
+          description: '(任意) 例: "Schema Sample"'
+          schema:
+            type: string
+        - name: version
+          required: false
+          in: query
+          description: '(任意) 例: "1.0.0"'
+          schema:
+            type: string
+        - name: description
+          required: false
+          in: query
+          description: '(任意) 例: '
+          schema:
+            type: string
+        - name: isBadgeSchema
+          required: false
+          in: query
+          description: '(任意) 例: true'
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Return all VcSchemas.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VcSchemasResponseDto'
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - vc-schemas
+      security:
+        - bearer: []
+    post:
+      operationId: VcSchemasController_create
+      summary: 新規VCスキーマ作成
+      description: 新規VCスキーマを作成します。
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVcSchemaDto'
+      responses:
+        '201':
+          description: The VcSchema has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VcSchemaResponseDto'
+        '400':
+          description: Bad request, entity already exists or invalid data
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - vc-schemas
+      security:
+        - bearer: []
+  /api/v1/vc-schemas/{id}:
+    get:
+      operationId: VcSchemasController_findOne
+      summary: VCスキーマ情報詳細取得
+      description: リクエストパラメータのidで指定された単一のVCスキーマの詳細情報の値を返します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return a single VcSchema.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VcSchemaResponseDto'
+        '400':
+          description: Invalid input
+        '403':
+          description: Forbidden.
+        '404':
+          description: Entity not found
+        '500':
+          description: Internal server error
+      tags:
+        - vc-schemas
+      security:
+        - bearer: []
+    put:
+      operationId: VcSchemasController_update
+      summary: VCスキーマへのグループ紐付け
+      description: VCスキーマに関連するグループを紐付けます。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVcSchemaDto'
+      responses:
+        '201':
+          description: The VcSchema has been successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VcSchemaResponseDto'
+        '403':
+          description: Forbidden.
+        '404':
+          description: Entity not found
+        '500':
+          description: Internal server error
+      tags:
+        - vc-schemas
+      security:
+        - bearer: []
+  /api/v1/files:
+    get:
+      operationId: FilesController_findAll
+      summary: ファイル一覧取得
+      description: ファイルを一覧として値を返します。
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: '(必須) ページネーションを表示する際のページ数に当たるクエリパラメーター。全件取得する際は1を指定。(デフォルト: 1)'
+          schema:
+            example: 1
+            type: number
+        - name: limit
+          required: false
+          in: query
+          description: >-
+            (必須)
+            ページネーションを表示する際のページ数あたりに表示する件数を指定するクエリパラメーター。全件取得する際は0を指定。(デフォルト: 10)
+          schema:
+            example: 10
+            type: number
+        - name: filename
+          required: false
+          in: query
+          description: '(任意) 例: "file-1732019975229-394515535.png"'
+          schema:
+            type: string
+        - name: originalname
+          required: false
+          in: query
+          description: '(任意) 例: "english-badge.png"'
+          schema:
+            type: string
+        - name: executed
+          required: false
+          in: query
+          description: '(任意) 例: true'
+          schema:
+            type: boolean
+        - name: type
+          required: false
+          in: query
+          description: '(任意) 例: "image/png"'
+          schema:
+            type: string
+        - name: status
+          required: false
+          in: query
+          description: '(任意) 例: 0'
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Return all files.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FilesResponseDto'
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - files
+      security:
+        - bearer: []
+    post:
+      operationId: FilesController_uploadFile
+      summary: ファイルアップロード
+      description: 新規ファイルアップロードを作成します。
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: The File has been successfully uploaded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileResponseDto'
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal server error
+      tags:
+        - files
+      security:
+        - bearer: []
+  /api/v1/files/{id}:
+    get:
+      operationId: FilesController_findOne
+      summary: ファイル詳細取得
+      description: リクエストパラメータのidで指定された単一のファイルの詳細情報の値を返します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return the count of files.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileResponseDto'
+        '400':
+          description: Invalid input
+        '403':
+          description: Forbidden.
+        '404':
+          description: Entity not found
+        '500':
+          description: Internal server error
+      tags:
+        - files
+      security:
+        - bearer: []
+    post:
+      operationId: FilesController_executeCSV
+      summary: CSVファイル実行
+      description: (非推奨) ユーザー、クライアント情報を記載したCSVファイルを実行し、新規アカウントを作成します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDidDto'
+      responses:
+        '201':
+          description: The file has been successfully created.
+        '400':
+          description: Bad request, entity already exists or invalid data
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - files
+      security:
+        - bearer: []
+    delete:
+      operationId: FilesController_remove
+      summary: ファイル削除
+      description: リクエストパラメータのidで指定された単一のファイルを削除します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The user has been successfully deleted.
+        '403':
+          description: Forbidden.
+        '404':
+          description: File not found
+        '500':
+          description: Internal server error
+      tags:
+        - files
+      security:
+        - bearer: []
+  /api/v1/files/{id}/download:
+    get:
+      operationId: FilesController_download
+      summary: ファイルダウンロード
+      description: リクエストパラメータのidで指定された単一のファイルのバイナリデータを返します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The file has been successfully downloaded.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Invalid input
+        '403':
+          description: Unauthorized
+        '404':
+          description: File not found
+        '500':
+          description: Internal server error
+      tags:
+        - files
+      security:
+        - bearer: []
+  /api/v1/vp-infos:
+    get:
+      operationId: VpInfosController_findAll
+      summary: VP情報一覧取得
+      description: アプリケーションが管理するVP情報を一覧として値を返します。
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: '(必須) ページネーションを表示する際のページ数に当たるクエリパラメーター。全件取得する際は1を指定。(デフォルト: 1)'
+          schema:
+            example: 1
+            type: number
+        - name: limit
+          required: false
+          in: query
+          description: >-
+            (必須)
+            ページネーションを表示する際のページ数あたりに表示する件数を指定するクエリパラメーター。全件取得する際は0を指定。(デフォルト: 10)
+          schema:
+            example: 10
+            type: number
+        - name: label
+          required: false
+          in: query
+          description: '(任意) 例: "vc-for-project1"'
+          schema:
+            type: string
+        - name: description
+          required: false
+          in: query
+          description: '(任意) '
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return all VpInfos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VpInfoResponseDto'
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - vp-infos
+      security:
+        - bearer: []
+    post:
+      operationId: VpInfosController_create
+      summary: 新規VP生成
+      description: 新規VPを生成します。
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVpInfoDto'
+      responses:
+        '201':
+          description: The VpInfo has been successfully created.
+        '400':
+          description: Bad request, entity already exists or invalid data
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - vp-infos
+      security:
+        - bearer: []
+  /api/v1/vp-infos/upload:
+    post:
+      operationId: VpInfosController_upload
+      summary: 新規VPアップロード
+      description: 外部で発行された既存VPをアップロードし、本アプリケーションに保存します。。
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadVPDto'
+      responses:
+        '201':
+          description: The VcInfo has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VpInfoResponseDto'
+        '400':
+          description: Bad request, entity already exists or invalid data
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - vp-infos
+      security:
+        - bearer: []
+  /api/v1/vp-infos/{id}:
+    get:
+      operationId: VpInfosController_findOne
+      summary: VP情報詳細取得
+      description: リクエストパラメータのidで指定された単一のVP情報の詳細情報の値を返します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return a single VpInfo.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VpInfoDetailDto'
+        '400':
+          description: Invalid input
+        '403':
+          description: Forbidden.
+        '404':
+          description: Entity not found
+        '500':
+          description: Internal server error
+      tags:
+        - vp-infos
+      security:
+        - bearer: []
+    put:
+      operationId: VpInfosController_connectUser
+      summary: VP情報へのクライアントアカウント紐付け
+      description: VP情報の所有者、関係者などの管理者としてクライアントアカウントを紐付けます。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVcInfoDto'
+      responses:
+        '201':
+          description: The VpInfo has been successfully updated.
+        '403':
+          description: Forbidden.
+        '404':
+          description: Entity not found
+        '500':
+          description: Internal server error
+      tags:
+        - vp-infos
+      security:
+        - bearer: []
+  /api/v1/vp-infos/{id}/label:
+    put:
+      operationId: VpInfosController_addLabel
+      summary: VP情報へのラベル追加
+      description: リクエストパラメータのidで指定された単一のVP情報に対して、任意の管理用ラベルを追加します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddLabelToVpInfoDto'
+      responses:
+        '201':
+          description: The VpInfo has been successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VpInfoResponseDto'
+        '403':
+          description: Forbidden.
+        '404':
+          description: VpInfo not found
+        '500':
+          description: Internal server error
+      tags:
+        - vp-infos
+      security:
+        - bearer: []
+  /api/v1/vp-infos/{id}/user:
+    delete:
+      operationId: VpInfosController_disconnectUser
+      summary: VP情報のクライアントアカウント紐付け解除
+      description: VP情報に紐付いたクライアントアカウントの紐付けを解除します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: The VpInfo has been successfully deleted.
+        '403':
+          description: Forbidden.
+        '404':
+          description: VcInfo not found
+        '500':
+          description: Internal server error
+      tags:
+        - vp-infos
+      security:
+        - bearer: []
+  /api/v1/verifications:
+    get:
+      operationId: VerificationsController_findAll
+      summary: VC/VP検証結果一覧取得
+      description: アプリケーションが管理するVC/VP検証結果を一覧として値を返します。
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: '(必須) ページネーションを表示する際のページ数に当たるクエリパラメーター。全件取得する際は1を指定。(デフォルト: 1)'
+          schema:
+            example: 1
+            type: number
+        - name: limit
+          required: false
+          in: query
+          description: >-
+            (必須)
+            ページネーションを表示する際のページ数あたりに表示する件数を指定するクエリパラメーター。全件取得する際は0を指定。(デフォルト: 10)
+          schema:
+            example: 10
+            type: number
+        - name: label
+          required: false
+          in: query
+          description: '(任意) 例: "verification-for-project1"'
+          schema:
+            type: string
+        - name: result
+          required: false
+          in: query
+          description: '(任意) 例: true'
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Return all Verification.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationsResponseDto'
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - verifications
+      security:
+        - bearer: []
+    post:
+      operationId: VerificationsController_create
+      summary: VC/VP検証
+      description: VC/VPの検証を実行します。
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificationDto'
+      responses:
+        '201':
+          description: The Verification has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponseDto'
+        '400':
+          description: Bad request, entity already exists or invalid data
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - verifications
+      security:
+        - bearer: []
+  /api/v1/verifications/{id}:
+    get:
+      operationId: VerificationsController_findOne
+      summary: VC/VP検証結果詳細取得
+      description: リクエストパラメータのidで指定された単一のVC/VP検証結果の詳細情報の値を返します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return a single Verification.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponseDto'
+        '400':
+          description: Invalid input
+        '403':
+          description: Forbidden.
+        '404':
+          description: Entity not found
+        '500':
+          description: Internal server error
+      tags:
+        - verifications
+      security:
+        - bearer: []
+  /api/v1/auth/login:
+    post:
+      operationId: AuthController_login
+      summary: アカウントログインを実施
+      description: アカウントログインを実行し、認証結果に応じてJSON Web Tokenの値を返します。
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignInDto'
+      responses:
+        '201':
+          description: Successfully Authorize User
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignInResponseDto'
+        '400':
+          description: 'Error: Bad request'
+        '404':
+          description: Entity not found
+        '500':
+          description: Internal server error
+      tags:
+        - auth
+      security:
+        - bearer: []
+  /api/v1/auth/profile:
+    get:
+      operationId: AuthController_getProfile
+      summary: ログイン済みのアカウント情報取得
+      description: ログイン済みの管理者アカウントの情報を返却します。
+      parameters: []
+      responses:
+        '200':
+          description: Return User Profile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetProfileResponseDto'
+        '401':
+          description: 'Error: Unauthorized.'
+          content:
+            application/json:
+              example:
+                message: Unauthorized
+                statusCode: 401
+        '500':
+          description: Internal server error
+      tags:
+        - auth
+      security:
+        - bearer: []
+  /api/v1/badges:
+    get:
+      operationId: BadgesController_findAll
+      summary: バッジ一覧取得
+      description: アプリケーションが管理するバッジ情報を一覧として値を返します。
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: '(必須) ページネーションを表示する際のページ数に当たるクエリパラメーター。全件取得する際は1を指定。(デフォルト: 1)'
+          schema:
+            example: 1
+            type: number
+        - name: limit
+          required: false
+          in: query
+          description: >-
+            (必須)
+            ページネーションを表示する際のページ数あたりに表示する件数を指定するクエリパラメーター。全件取得する際は0を指定。(デフォルト: 10)
+          schema:
+            example: 10
+            type: number
+        - name: label
+          required: false
+          in: query
+          description: '(任意) 例: "sample-badge-1"'
+          schema:
+            type: string
+        - name: filename
+          required: false
+          in: query
+          description: '(任意) 例: "badge-12345-12345.png"'
+          schema:
+            type: string
+        - name: description
+          required: false
+          in: query
+          description: '(任意) '
+          schema:
+            type: string
+        - name: status
+          required: false
+          in: query
+          description: '(任意) 例: 1'
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Return all VcInfos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadgesResponseDto'
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - badges
+      security:
+        - bearer: []
+    post:
+      operationId: BadgesController_create
+      summary: 新規バッジ発行
+      description: 新規バッジを発行します。
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBadgeDto'
+      responses:
+        '201':
+          description: The Badge has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadgeResponseDto'
+        '400':
+          description: Bad request, entity already exists or invalid data
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - badges
+      security:
+        - bearer: []
+  /api/v1/badges/{id}:
+    get:
+      operationId: BadgesController_findOne
+      summary: バッジ詳細取得
+      description: リクエストパラメータのidで指定された単一のバッジ情報の詳細情報の値を返します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return a single VcInfo.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadgeResponseDto'
+        '400':
+          description: Invalid input
+        '403':
+          description: Forbidden.
+        '404':
+          description: Entity not found
+        '500':
+          description: Internal server error
+      tags:
+        - badges
+      security:
+        - bearer: []
+  /api/v1/badges/{id}/label:
+    put:
+      operationId: BadgesController_addLabel
+      summary: Badgeへのラベル追加
+      description: リクエストパラメータのidで指定された単一のBadgeに対して、任意の管理用ラベルを追加します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddLabelToBadgeDto'
+      responses:
+        '201':
+          description: The Badge has been successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadgeResponseDto'
+        '403':
+          description: Forbidden.
+        '404':
+          description: Badge not found
+        '500':
+          description: Internal server error
+      tags:
+        - badges
+      security:
+        - bearer: []
+  /api/v1/badges/{id}/download:
+    get:
+      operationId: BadgesController_download
+      summary: バッジダウンロード
+      description: リクエストパラメータのidで指定された単一のバッジ画像のバイナリデータを返します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: vpInfoId
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The file has been successfully downloaded.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Invalid input
+        '403':
+          description: Forbidden.
+        '404':
+          description: Entity not found
+        '500':
+          description: Internal server error
+      tags:
+        - badges
+      security:
+        - bearer: []
+  /api/v1/badges/{id}/verify:
+    put:
+      operationId: BadgesController_verify
+      summary: バッジ検証
+      description: バッジのVC/VPの検証を実行します。
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyBadgeDto'
+      responses:
+        '201':
+          description: The Verification has been successfully created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifiyBadgeReponseDto'
+        '400':
+          description: Bad request, entity already exists or invalid data
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - badges
+      security:
+        - bearer: []
+  /api/v1/badges/file:
+    post:
+      operationId: BadgesController_fileVerify
+      summary: バッジファイル検証
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifiyBadgeFileReponseDto'
+        '400':
+          description: Failed
+      tags:
+        - badges
+      security:
+        - bearer: []
+  /api/v1/settings:
+    get:
+      operationId: SettingsController_findAll
+      summary: Get all admins
+      parameters: []
+      responses:
+        '200':
+          description: Return all admins.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingListResponseDto'
+        '403':
+          description: Forbidden.
+        '500':
+          description: Internal server error
+      tags:
+        - settings
+      security:
+        - bearer: []
+  /api/v1/settings/{key}:
+    get:
+      operationId: SettingsController_findOne
+      summary: Get a specific admin
+      parameters:
+        - name: key
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Return a single admin.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingResponseDto'
+        '400':
+          description: Invalid input
+        '403':
+          description: Forbidden.
+        '404':
+          description: Entity not found
+        '500':
+          description: Internal server error
+      tags:
+        - settings
+      security:
+        - bearer: []
+info:
+  title: iDroit Dashboard Admin API
+  description: |2-
+
+        これは[株式会社フォアー](https://www.fore-co.ltd/ja/)が開発するを使ったDecentralizd Identifiers / Verifiable Credentials(DID/VC)に関係する機能を簡単に利用するための REST API です。現在以下のユースケースをサポートしています。これは今後も拡張されていきます。
+        - DIDの生成: 
+        - グループ管理機能
+          - (企業/プロジェクトのまとまり)ごとにユーザー、クライアント、証明書(VC)スキーマを紐付けて管理する。
+        
+        詳細は以下を参照してください。
+        - [idroit dashboard admin UI](https://admin.idroit-dashboard.com)
+        - [idroit dashboard公式ホームページ]()
+        - [idroit dashboard操作マニュアル]()
+
+        以下は関連リンクです。
+        - [Universal Resolver](https://dev.uniresolver.io/)
+        - [W3C DID Core 1.0](https://www.w3.org/TR/did-core/)
+        - [Verifiable Credentials Data Model v2.0](https://www.w3.org/TR/vc-data-model-2.0/)
+      
+  version: 0.9.2
+  contact: {}
+tags:
+  - name: auth
+    description: ''
+  - name: users
+    description: ''
+  - name: groups
+    description: ''
+  - name: settings
+    description: ''
+  - name: did-infos
+    description: ''
+  - name: vc-infos
+    description: ''
+  - name: vp-infos
+    description: ''
+  - name: verifications
+    description: ''
+  - name: vc-schemas
+    description: ''
+  - name: badges
+    description: ''
+  - name: files
+    description: ''
+  - name: mails
+    description: ''
+servers: []
+components:
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+  schemas:
+    UserToken:
+      type: object
+      properties: {}
+    VcContext:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: (必須) VCスキーマの識別子
+        context:
+          type: string
+          example: https://www.w3.org/ns/credentials/v2
+          description: (必須) VCスキーマのタイトル
+        vcSchema:
+          description: (任意) contextが紐づくVCスキーマ
+          allOf:
+            - $ref: '#/components/schemas/VcSchema'
+        createdAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) VCスキーマの作成日時
+        updatedAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) VCスキーマの更新日時
+      required:
+        - id
+        - context
+        - vcSchema
+        - createdAt
+        - updatedAt
+    VcSchemaProperty:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: The ID of the vcSchema
+        propIndex:
+          type: number
+          example: 1
+          description: property Index number
+        propName:
+          type: string
+          example: prop1
+          description: property Name of credentialSubject
+        propType:
+          type: string
+          example: string
+          description: property Type of credentialSubject
+        parentObjectIndex:
+          type: number
+          example: parentObjectIndex
+          description: parent property
+        vcSchema:
+          description: The VcSchema is origin
+          allOf:
+            - $ref: '#/components/schemas/VcSchema'
+        createdAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: The date the user was created
+        updatedAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: The date the user was last updated
+      required:
+        - id
+        - propIndex
+        - propName
+        - propType
+        - parentObjectIndex
+        - createdAt
+        - updatedAt
+    Group:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: (必須) グループの識別子
+        name:
+          type: string
+          example: Project Group 1
+          description: '(必須) グループの名前。(例: プロジェクト名や企業名など)'
+        status:
+          type: string
+          example: active
+          enum:
+            - active
+            - deactive
+          description: '(必須) グループの状態(1: アクティブ, 0: 停止中)'
+        description:
+          type: string
+          example: This is Project Group 1.
+          description: (任意) グループの作成目的や用途など任意で設定可能な説明文
+        users:
+          description: (任意) グループに紐付いたアカウントの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        createdBy:
+          description: (必須) グループを作成したユーザーアカウント。
+          allOf:
+            - $ref: '#/components/schemas/User'
+        didInfos:
+          description: (任意) グループに紐付いたDID情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/DidInfo'
+        vcInfos:
+          description: (任意) グループに紐付いたVC情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VcInfo'
+        vpInfos:
+          description: (任意) グループに紐付いたVP情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VpInfo'
+        vcSchemas:
+          description: (任意) グループに紐付いたVCスキーマの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VcSchema'
+        createdAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) グループの作成日時
+        updatedAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) グループの最終更新日時
+      required:
+        - id
+        - name
+        - status
+        - description
+        - createdBy
+        - createdAt
+        - updatedAt
+    Badge:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: (必須) バッジの識別子
+        label:
+          type: string
+          example: sample-badge-1
+          description: (任意) バッジのラベル名
+        filename:
+          type: string
+          example: badge-12345-12345.png
+          description: (任意) バッジのファイル名
+        description:
+          type: string
+          example: This is Sample Badge 1.
+          description: (任意) バッジの作成目的や用途など任意で設定可能な説明文
+        status:
+          type: number
+          example: 1
+          description: '(必須) バッジの状態(1: アクティブ, 0: 停止中)'
+        vcSchema:
+          description: (任意) バッジに紐付いたVCスキーマ
+          allOf:
+            - $ref: '#/components/schemas/VcSchema'
+        vcInfo:
+          description: (任意) バッジに紐付き、メタデータとなるVC情報
+          allOf:
+            - $ref: '#/components/schemas/VcInfo'
+        createdAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) グループの作成日時
+        updatedAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) グループの最終更新日時
+      required:
+        - id
+        - description
+        - status
+        - createdAt
+        - updatedAt
+    File:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: (必須) ファイルの識別子
+        filename:
+          type: string
+          example: file-1729389547388-110834208.csv
+          description: (任意) システム内で管理される際にシステムによって名付けられるユニークなファイル名
+        originalname:
+          type: string
+          example: testdata.csv
+          description: (必須) システムへアップロード時の元のファイル名
+        type:
+          type: string
+          example: text/csv
+          description: (必須) ファイル形式
+        fileData:
+          type: string
+          example: text/csv
+          description: (必須) ファイルのバイナリデータ
+        executed:
+          type: boolean
+          example: false
+          description: '(任意) ファイルがCSVの場合、アカウントデータ生成実行に使用されたか。(true: 実行済み, false: 未使用)'
+        status:
+          type: number
+          example: 0
+          description: (必須) ファイルのステータス
+        group:
+          description: (任意) ファイルを紐づけたグループの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+        vcSchema:
+          description: (任意) ファイルに紐づいたVCスキーマ
+          allOf:
+            - $ref: '#/components/schemas/VcSchema'
+        createdBy:
+          description: (必須) ファイルをアップロードしたユーザーアカウント。
+          allOf:
+            - $ref: '#/components/schemas/User'
+        createdAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) ファイルの作成日時
+        updatedAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) グループの最終更新日時
+      required:
+        - id
+        - filename
+        - originalname
+        - type
+        - fileData
+        - executed
+        - status
+        - group
+        - createdBy
+        - createdAt
+        - updatedAt
+    VcSchema:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: (必須) VCスキーマの識別子
+        title:
+          type: string
+          example: VC Schema 1
+          description: (必須) VCスキーマのタイトル
+        version:
+          type: string
+          example: 1.0.0
+          description: (必須) VCスキーマのバージョン
+        description:
+          type: string
+          example: This is Project Group 1.
+          description: (任意) VCスキーマの説明文
+        isBadgeSchema:
+          type: string
+          example: false
+          description: (必須) VCスキーマがバッジのスキーマか否か
+          default: false
+        vcInfos:
+          description: (任意) このVCスキーマを用いて生成したVC情報の配列。
+          type: array
+          items:
+            $ref: '#/components/schemas/VcInfo'
+        vcContexts:
+          description: (任意) VCスキーマに設定したcontext項目の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VcContext'
+        vcSchemaProperties:
+          description: (必須) VCスキーマの項目情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VcSchemaProperty'
+        groups:
+          description: (任意) VCスキーマを紐付けたグループの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+        badges:
+          description: (任意) VCスキーマを紐付けたバッジ
+          type: array
+          items:
+            $ref: '#/components/schemas/Badge'
+        file:
+          description: (任意) VCスキーマに紐付けるバッジ用の画像。`isBadgeSchema`プロパティが`true`の場合必須。
+          allOf:
+            - $ref: '#/components/schemas/File'
+        createdBy:
+          description: (必須) VCスキーマを作成したユーザーアカウント。
+          allOf:
+            - $ref: '#/components/schemas/User'
+        createdAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) VCスキーマの作成日時
+        updatedAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) VCスキーマの更新日時
+      required:
+        - id
+        - title
+        - version
+        - description
+        - createdBy
+        - createdAt
+        - updatedAt
+    Verification:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: (必須) 検証結果の識別子
+        label:
+          type: string
+          example: verification-1
+          description: >-
+            (必須) 検証結果の識別や整理などの管理するにあったてメタデータとして任意で設定可能な単語のフレーズ。(例:
+            verify-for-check)
+        result:
+          type: boolean
+          example: true
+          description: '(必須) VC/VPの検証結果(true: 検証に成功, false: 検証に失敗)'
+        createdBy:
+          description: (任意) 検証結果を作成したユーザーアカウント
+          allOf:
+            - $ref: '#/components/schemas/User'
+        vcInfo:
+          description: (任意) 検証を実行したVC情報の識別子
+          allOf:
+            - $ref: '#/components/schemas/VcInfo'
+        vpInfo:
+          description: (任意) 検証を実行したVP情報の識別子
+          allOf:
+            - $ref: '#/components/schemas/VpInfo'
+        createdAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) 検証実行時の日時
+        updatedAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) 検証結果の最終更新日
+      required:
+        - id
+        - label
+        - result
+        - createdBy
+        - createdAt
+        - updatedAt
+    VcInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: (必須) VC情報の識別子
+        label:
+          type: string
+          example: vc-info-1
+          description: >-
+            (任意) VCの識別や整理などの管理するにあったてメタデータとして任意で設定可能な単語のフレーズ。(例:
+            vc-for-project1)
+        hash:
+          type: string
+          example: 11bf5b37-e0b8-42e0-8dcf-dc8c4aefc000
+          description: (必須) VCのハッシュ値。VCの保管における識別子として用いる。
+        description:
+          type: string
+          example: This is Project Group 1.
+          description: (任意) VCの発行目的や用途など任意で設定可能な説明文。
+        createdBy:
+          description: (任意) VC情報を生成したユーザーアカウント
+          allOf:
+            - $ref: '#/components/schemas/User'
+        vcSchema:
+          description: (任意) 発行したVCの元となるVCスキーマ
+          allOf:
+            - $ref: '#/components/schemas/VcSchema'
+        user:
+          description: (任意) VC情報と紐付いたアカウント
+          allOf:
+            - $ref: '#/components/schemas/User'
+        vpInfos:
+          description: (任意) このVCを元に生成したVP情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VpInfo'
+        groups:
+          description: (任意) VC情報に紐づいたグループの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+        badge:
+          description: (任意) VC情報と紐付いたバッジ
+          allOf:
+            - $ref: '#/components/schemas/Badge'
+        verifications:
+          description: (任意) このVCの検証結果の配列。
+          type: array
+          items:
+            $ref: '#/components/schemas/Verification'
+        createdAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) VC情報の作成日時
+        updatedAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) VC情報の更新日時
+      required:
+        - id
+        - label
+        - hash
+        - description
+        - createdBy
+        - createdAt
+        - updatedAt
+    VpInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: (必須) VP情報の識別子
+        label:
+          type: string
+          example: vp-info-1
+          description: (任意) VPの識別や整理などの管理するにあったてメタデータとして任意で設定可能な単語のフレーズ
+        hash:
+          type: string
+          example: 11bf5b37-e0b8-42e0-8dcf-dc8c4aefc000
+          description: (必須) VPのハッシュ値。VPの保管における識別子として用いる。
+        description:
+          type: string
+          example: This is VP for hoge.
+          description: (任意) VCの発行目的や用途など任意で設定可能な説明文。
+        raw:
+          type: string
+          example: ''
+          description: (必須) VPのバイナリデータ
+        createdBy:
+          description: (任意) VP情報を生成したユーザーアカウント
+          allOf:
+            - $ref: '#/components/schemas/User'
+        user:
+          description: (任意) VP情報と紐付いたアカウント
+          allOf:
+            - $ref: '#/components/schemas/User'
+        vcInfos:
+          description: (任意) VPを生成する元となるVC情報
+          type: array
+          items:
+            $ref: '#/components/schemas/VcInfo'
+        groups:
+          description: (任意) VP情報に紐づいたグループの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+        didInfo:
+          description: (任意) VP生成時の署名に用いるDID情報の識別子
+          allOf:
+            - $ref: '#/components/schemas/DidInfo'
+        verifications:
+          description: (任意) VPの検証結果
+          type: array
+          items:
+            $ref: '#/components/schemas/Verification'
+        createdAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) VP情報の作成日時
+        updatedAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) VP情報の更新日時
+      required:
+        - id
+        - raw
+        - createdBy
+        - createdAt
+        - updatedAt
+    DidInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: (必須) DID情報の識別子
+        manageUuid:
+          type: string
+          example: 32bad62a-4186-4d04-a26a-fcee79d5824b
+          description: (必須) DID情報の管理に用いるユニークな識別子
+        did:
+          type: string
+          example: did:key:12345
+          description: (必須) DID
+        method:
+          type: string
+          example: key
+          enum:
+            - key
+            - web
+            - ethr
+            - ethr:arbitrum:goerli
+            - ethr:sepolia
+          description: (必須) DIDメソッド
+        label:
+          type: string
+          example: did-info-1
+          description: >-
+            (任意) DIDの識別や整理などの管理するにあったてメタデータとして任意で設定可能な単語のフレーズ。(例:
+            did-for-project1)
+        domainName:
+          type: string
+          example: domain-name.com
+          description: >-
+            (任意)
+            did:webメソッドでDIDを生成する際に必要なドメイン名。DIDによって指定されたドメインがドメインネームシステム(DNS)を通じて解決されるときのホスト名。did:webメソッド以外では必要のないカラムである。
+        existPrivateKey:
+          type: boolean
+          example: true
+          description: (必須) DID情報に紐付いた秘密鍵を本アプリケーションで保管しているか否か
+        description:
+          type: string
+          example: This is Project Group 1.
+          description: (任意) DID情報の生成目的や用途など任意で設定可能な説明文
+        user:
+          description: (任意) DID情報に紐付いたアカウントの配列
+          allOf:
+            - $ref: '#/components/schemas/User'
+        createdBy:
+          description: (任意) DIDを生成したユーザーアカウント
+          allOf:
+            - $ref: '#/components/schemas/User'
+        vpInfos:
+          description: (任意) 生成時に署名にDIDを用いたVP情報
+          allOf:
+            - $ref: '#/components/schemas/VpInfo'
+        groups:
+          description: (任意) DID情報に紐づいたグループの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+        createdAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) DID情報の作成日時
+        updatedAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) DID情報の最終更新
+      required:
+        - id
+        - manageUuid
+        - did
+        - method
+        - label
+        - domainName
+        - existPrivateKey
+        - description
+        - createdBy
+        - createdAt
+        - updatedAt
+    Mail:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: (必須) 送信済みメールの識別子
+        title:
+          type: string
+          example: '[iDroit Dashboard] mail title'
+          description: (必須) 送信済みメールの件名
+        content:
+          type: string
+          example: This is Mail content.
+          description: (必須) 送信済みメールの内容
+        forEveryUser:
+          type: boolean
+          example: false
+          description: >-
+            (必須) 全てのuser権限アカウントに対して送信するか。(true: 全てのuser権限アカウントに送信, false:
+            全てのuser権限アカウントに送信しない)
+        forEveryClient:
+          type: boolean
+          example: false
+          description: >-
+            (必須) 全てのclient権限アカウントに対して送信するか。(true: 全てのclient権限アカウントに送信, false:
+            全てのclient権限アカウントに送信しない)
+        users:
+          description: (任意) メールの送信先となるユーザーアカウントの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        groups:
+          description: (任意) メールの送信先となるグループの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+        createdBy:
+          description: (必須) メール送信操作を行ったAdmin権限アカウント
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        createdAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) メールの送信日時
+        updatedAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: (必須) メールの送信日時
+      required:
+        - id
+        - title
+        - content
+        - forEveryUser
+        - forEveryClient
+        - createdAt
+        - updatedAt
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 123e4567-e89b-12d3-a456-426614174000
+          description: アカウントの識別子
+        name:
+          type: string
+          example: Jhon Doe
+          description: アカウントの名前
+        email:
+          type: string
+          example: user@email.com
+          description: アカウントのメールアドレス
+        password:
+          type: string
+          example: Password1234
+          description: アカウントのパスワード(8文字以上20字未満)
+        needActivateFlow:
+          type: boolean
+          example: false
+          description: '(必須: {default: false}) アカウントの有効化フローが必要か否か(true: 必要 /false: 不要)'
+        status:
+          type: string
+          example: active
+          enum:
+            - inactive
+            - activating
+            - active
+            - deactive
+          description: ユーザーのアカウントステータス
+        role:
+          type: string
+          example: client
+          enum:
+            - admin
+            - user
+            - client
+          description: アカウントのロール(admin/user/clinet)
+        createdBy:
+          description: (任意) このアカウントを作成したユーザー
+          allOf:
+            - $ref: '#/components/schemas/User'
+        didInfos:
+          description: (任意) アカウントに紐付けされたDID情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/DidInfo'
+        vcInfos:
+          description: (任意) アカウントに紐付けされたVC情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VcInfo'
+        vpInfos:
+          description: (任意) アカウントに紐付けされたVP情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VpInfo'
+        groups:
+          description: (任意) アカウントに紐付けされたグループの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+        userTokens:
+          description: (任意) ユーザーアカウントがアップロードしたファイルの配列。
+          type: array
+          items:
+            $ref: '#/components/schemas/UserToken'
+        createdUsers:
+          description: (任意) このユーザーによって作成されたアカウントの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        createdVcInfos:
+          description: (任意) アカウントに紐付けされたVC情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VcInfo'
+        createdVpInfos:
+          description: (任意) アカウントに紐付けされたVP情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VpInfo'
+        createdGroups:
+          description: (任意) アカウントに作成したグループの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+        createdDidInfos:
+          description: (任意) アカウントが作成したDID情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/DidInfo'
+        createdVcSchemas:
+          description: (任意) ユーザーアカウントが作成したVCスキーマの配列。
+          type: array
+          items:
+            $ref: '#/components/schemas/VcSchema'
+        createdVerifications:
+          description: (任意) ユーザーアカウントが実行した検証結果の配列。
+          type: array
+          items:
+            $ref: '#/components/schemas/Verification'
+        createdMails:
+          description: (任意) Admin権限アカウントが送信したメールの配列(Adminロール以外の場合、関係のないカラム)
+          type: array
+          items:
+            $ref: '#/components/schemas/Mail'
+        createdFiles:
+          description: (任意) ユーザーアカウントがアップロードしたファイルの配列。
+          type: array
+          items:
+            $ref: '#/components/schemas/File'
+        createdAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: ユーザーアカウントの作成日時
+        updatedAt:
+          type: string
+          example: '2024-05-24T06:39:25.756Z'
+          description: ユーザーアカウントの更新日時
+      required:
+        - id
+        - name
+        - email
+        - password
+        - needActivateFlow
+        - status
+        - role
+        - userTokens
+        - createdVcSchemas
+        - createdVerifications
+        - createdFiles
+        - createdAt
+        - updatedAt
+    UserResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: ユーザーアカウントの識別子
+        name:
+          type: string
+          example: John Doe
+          description: ユーザーアカウントの名前
+        email:
+          type: string
+          example: user1@email.com
+          description: ユーザーアカウントのメールアドレス
+        needActivateFlow:
+          type: boolean
+          example: true
+          description: 'ユーザーアクティベーション(true: アクティブ /false: 停止中)'
+        status:
+          type: string
+          example: active
+          enum:
+            - inactive
+            - activating
+            - active
+            - deactive
+          description: >-
+            ユーザーのアカウントステータス("inactive": アクティブ未完了, "acrivating": アクティブ作業途中,
+            "active": アクティブ中, "deactive": 論理削除済)
+        role:
+          type: string
+          example: user
+          enum:
+            - admin
+            - user
+            - client
+          description: ユーザーのアカウントロール("admin", "user", "client")
+        userTokens:
+          description: (任意) ユーザーアカウントがアップロードしたファイルの配列。
+          type: array
+          items:
+            $ref: '#/components/schemas/UserToken'
+        createdBy:
+          example:
+            id: e8973f1a-a80f-4243-8061-144565b640f2
+            name: admin
+            email: admin@email.com
+            needActivateFlow: false
+            status: active
+            role: admin
+            createdAt: '2025-02-04T22:32:21.343Z'
+            updatedAt: '2025-02-04T22:32:21.343Z'
+          description: ユーザーアカウントを作成したユーザーアカウント
+          allOf:
+            - $ref: '#/components/schemas/User'
+        didInfos:
+          example:
+            - id: bde07fae-69de-44c4-bb87-1763c2058b56
+              manageUuid: 32bad62a-4186-4d04-a26a-fcee79d5824b
+              did: did:key:z6MkhGeGj7u5htkCYjE4PaQ8HUqjYyTmxpDb6Q1MqUpUDsN7
+              method: key
+              label: did-for-project1
+              domainName: ''
+              existPrivateKey: true
+              description: This is the description of did
+              createdAt: '2024-07-09T04:37:14.248Z'
+              updatedAt: '2024-07-09T04:37:14.248Z'
+          description: ユーザーアカウントに紐付けられたDID情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/DidInfo'
+        vcInfos:
+          example:
+            - id: 123e4567-e89b-12d3-a456-426614174000
+              label: vc-info-1
+              hash: 11bf5b37-e0b8-42e0-8dcf-dc8c4aefc000
+              description: ''
+              createdAt: '2024-07-09T04:37:14.248Z'
+              updatedAt: '2024-07-09T04:37:14.248Z'
+          description: ユーザーアカウントに紐付けられたVC情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VcInfo'
+        vpInfos:
+          example:
+            - id: dcb884cb-bf93-437d-906b-67fb893dea98
+              hash: Qma1dK93xnJpyuSeQcFiq6JC5LANRTBegE3EUN79udbCcv
+              description: ''
+              createdAt: '2024-05-24T06:39:54.352Z'
+              updatedAt: '2024-05-24T06:39:54.352Z'
+          description: ユーザーアカウントに紐付けられたVP情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VpInfo'
+        groups:
+          example:
+            - id: 123e4567-e89b-12d3-a456-426614174000
+              name: Project Group 1
+              status: active
+              description: This is Project Group 1.
+              createdAt: '2024-05-24T06:39:54.352Z'
+              updatedAt: '2024-05-24T06:39:54.352Z'
+          description: ユーザーアカウントが作成したグループの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+        createdUsers:
+          example:
+            - id: dcb884cb-bf93-437d-906b-67fb893dea98
+              hash: Qma1dK93xnJpyuSeQcFiq6JC5LANRTBegE3EUN79udbCcv
+              description: ''
+              createdAt: '2024-05-24T06:39:54.352Z'
+              updatedAt: '2024-05-24T06:39:54.352Z'
+          description: ユーザーアカウントに紐付けされたVP情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        createdVcInfos:
+          example:
+            - id: dcb884cb-bf93-437d-906b-67fb893dea98
+              hash: Qma1dK93xnJpyuSeQcFiq6JC5LANRTBegE3EUN79udbCcv
+              description: ''
+              createdAt: '2024-05-24T06:39:54.352Z'
+              updatedAt: '2024-05-24T06:39:54.352Z'
+          description: ユーザーが作成したVC情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VcInfo'
+        createdVpInfos:
+          example:
+            - id: dcb884cb-bf93-437d-906b-67fb893dea98
+              hash: Qma1dK93xnJpyuSeQcFiq6JC5LANRTBegE3EUN79udbCcv
+              description: ''
+              createdAt: '2024-05-24T06:39:54.352Z'
+              updatedAt: '2024-05-24T06:39:54.352Z'
+          description: ユーザーが作成したVP情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VpInfo'
+        createdGroups:
+          example:
+            - id: 123e4567-e89b-12d3-a456-426614174000
+              name: Project Group 1
+              status: active
+              description: This is Project Group 1.
+              createdAt: '2024-05-24T06:39:54.352Z'
+              updatedAt: '2024-05-24T06:39:54.352Z'
+          description: ユーザーアカウントが作成したグループの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+        createdDidInfos:
+          example:
+            - id: bde07fae-69de-44c4-bb87-1763c2058b56
+              manageUuid: 32bad62a-4186-4d04-a26a-fcee79d5824b
+              did: did:key:z6MkhGeGj7u5htkCYjE4PaQ8HUqjYyTmxpDb6Q1MqUpUDsN7
+              method: key
+              label: did-for-project1
+              domainName: ''
+              existPrivateKey: true
+              description: This is the description of did
+              createdAt: '2024-07-09T04:37:14.248Z'
+              updatedAt: '2024-07-09T04:37:14.248Z'
+          description: ユーザーが作成したDID情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/DidInfo'
+        createdVcSchemas:
+          example:
+            - id: fc765af3-63da-4030-9c2d-3c6b44ae283d
+              title: hogeVC
+              version: 1.0.0
+              description: ''
+              createdAt: '2024-10-18T04:17:56.564Z'
+              updatedAt: '2024-10-18T04:17:56.564Z'
+          description: ユーザーが作成したVCスキーマの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VcSchema'
+        createdVerifications:
+          example: []
+          description: ユーザーアカウントが実行した検証結果の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/Verification'
+        createdMails:
+          example: []
+          description: Admin権限アカウントが送信したメールの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/Mail'
+        createdFiles:
+          example: []
+          description: ユーザーアカウントに紐付けされたファイルの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/File'
+        createdAt:
+          type: string
+          example: '2024-05-24T06:39:54.352Z'
+          description: ユーザーアカウントの作成日時
+        updatedAt:
+          type: string
+          example: '2024-05-24T06:39:54.352Z'
+          description: ユーザーアカウントの更新日時
+      required:
+        - id
+        - name
+        - email
+        - needActivateFlow
+        - status
+        - role
+        - userTokens
+        - createdBy
+        - createdAt
+        - updatedAt
+    MetaDto:
+      type: object
+      properties:
+        totalItems:
+          type: number
+          example: 1
+          description: Total number of items
+        itemCount:
+          type: number
+          example: 1
+          description: Number of items on the current page
+        itemsPerPage:
+          type: number
+          example: 10
+          description: Number of items per page
+        totalPages:
+          type: number
+          example: null
+          description: Total number of pages
+        currentPage:
+          type: number
+          example: 1
+          description: Current page number
+      required:
+        - totalItems
+        - itemCount
+        - itemsPerPage
+        - totalPages
+        - currentPage
+    LinkDto:
+      type: object
+      properties:
+        first:
+          type: string
+          example: https://api.idroit-dashboard.com/items?limit=0
+          description: URL for the first page
+        previous:
+          type: object
+          example: 10
+          description: URL for the previous page
+        next:
+          type: string
+          example: https://api.idroit-dashboard.com/items?page=2&limit=0
+          description: URL for the next page
+        last:
+          type: string
+          example: https://api.idroit-dashboard.com/items?page=Infinity&limit=0
+          description: URL for the last page
+      required:
+        - first
+        - previous
+        - next
+        - last
+    UsersResponseDto:
+      type: object
+      properties:
+        items:
+          description: Array of user items
+          type: array
+          items:
+            $ref: '#/components/schemas/UserResponseDto'
+        meta:
+          $ref: '#/components/schemas/MetaDto'
+        links:
+          $ref: '#/components/schemas/LinkDto'
+      required:
+        - items
+        - meta
+        - links
+    CreateUserDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: John Doe
+          description: (必須) ユーザーアカウントの名前
+        email:
+          type: string
+          example: user@email.com
+          description: (必須) ユーザーアカウントのメールアドレス
+        password:
+          type: string
+          example: Password1234
+          description: (任意) ユーザーアカウントのパスワード(8文字以上20字未満)。"needActivateFlow"が"false"の場合は必須。
+        role:
+          type: string
+          example: client
+          description: (必須) アカウントのタイプ
+        needActivateFlow:
+          type: boolean
+          example: false
+          description: '(任意) アカウントの有効化フローが必要か否か。デフォルト値ではfalse。(true: 必要 /false: 不要)'
+        groupIds:
+          example:
+            - 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: (任意) ユーザーアカウントに紐付けるグループのIDの配列
+          type: array
+          items:
+            type: string
+      required:
+        - name
+        - email
+        - role
+    GenerateDidDto:
+      type: object
+      properties:
+        didMethod:
+          type: array
+          description: >-
+            (必須) 新規生成するDIDのメソッド。(現在対応するDIDメソッド: "key", "ether", "ethr:sepolia",
+            "ethr:arbitrum:goerli", "web")
+          items:
+            type: string
+            enum:
+              - key
+              - web
+              - ethr:sepolia
+              - ethr
+              - ethr:arbitrum:goerli
+        label:
+          type: string
+          example: did-for-project1
+          description: >-
+            (任意) DIDの識別や整理などの管理するにあったてメタデータとして任意で設定可能な単語のフレーズ。(例:
+            did-for-project1)
+        domainName:
+          type: string
+          example: domain-name.com
+          description: >-
+            (任意)
+            did:webメソッドでDIDを生成する際に必要なドメイン名。DIDによって指定されたドメインがドメインネームシステム(DNS)を通じて解決されるときのホスト名。did:webメソッド以外では必要のないパラメータなため任意の項目である。
+        description:
+          type: string
+          example: DIDの生成目的や用途など任意で設定可能な説明文。
+          description: (任意) DIDの生成目的や用途など任意で設定可能な説明文。
+      required:
+        - didMethod
+    RegistrationProcessDto:
+      type: object
+      properties:
+        password:
+          type: string
+          example: Password1234
+          description: The password of the user
+      required:
+        - password
+    GroupResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: グループの識別子
+        name:
+          type: string
+          example: Group A
+          description: ' グループの名前'
+        status:
+          type: string
+          example: active
+          enum:
+            - active
+            - deactive
+          description: 'グループの状態(1: アクティブ, 0: 停止中)'
+        description:
+          type: string
+          example: This is Group A for Project X.
+          description: グループの作成目的や用途など任意で設定可能な説明文
+        users:
+          example:
+            - id: 70ceb004-0550-460a-ad40-c31614bb0109
+              firstName: user
+              lastName: test
+              email: user1@email.com
+              isActive: false
+              createdAt: '2024-10-21T14:01:16.111Z'
+              updatedAt: '2024-10-21T14:01:41.000Z'
+          description: グループに紐付いたユーザーアカウントの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        createdBy:
+          example:
+            id: e8973f1a-a80f-4243-8061-144565b640f2
+            name: admin
+            email: admin@email.com
+            needActivateFlow: false
+            status: active
+            role: admin
+            createdAt: '2025-02-04T22:32:21.343Z'
+            updatedAt: '2025-02-04T22:32:21.343Z'
+          description: グループを作成したユーザーアカウント
+          allOf:
+            - $ref: '#/components/schemas/User'
+        didInfos:
+          example: []
+          description: グループに紐付いたVC情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/DidInfo'
+        vcInfos:
+          example: []
+          description: グループに紐付いたVC情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VcInfo'
+        vpInfos:
+          example: []
+          description: グループに紐付いたVP情報の配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VpInfo'
+        vcSchemas:
+          example: []
+          description: グループに紐付いたVCスキーマの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VcSchema'
+        createdAt:
+          type: string
+          example: '2024-05-24T06:39:54.352Z'
+          description: グループの作成日時
+        updatedAt:
+          type: string
+          example: '2024-05-24T06:39:54.352Z'
+          description: グループの最終更新日時
+      required:
+        - id
+        - name
+        - status
+        - description
+        - users
+        - createdBy
+        - didInfos
+        - vcInfos
+        - vpInfos
+        - vcSchemas
+        - createdAt
+        - updatedAt
+    GroupsResponseDto:
+      type: object
+      properties:
+        items:
+          description: Array of group items
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupResponseDto'
+        meta:
+          $ref: '#/components/schemas/MetaDto'
+        links:
+          $ref: '#/components/schemas/LinkDto'
+      required:
+        - items
+        - meta
+        - links
+    CreateGroupDto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Group A
+          description: '(必須) グループの名前。(例: プロジェクト名や企業名など)'
+        description:
+          type: string
+          example: This is Group A for Project X.
+          description: (任意) グループの作成目的や用途など任意で設定可能な説明文
+      required:
+        - name
+    ConnectUsersDto:
+      type: object
+      properties:
+        userIds:
+          example:
+            - 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: (必須) グループに紐付けを行うユーザーアカウント識別子の配列
+          type: array
+          items:
+            type: string
+      required:
+        - userIds
+    ConnectVcSchemasDto:
+      type: object
+      properties:
+        vcSchemaIds:
+          example:
+            - 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: (必須) グループに紐付けを行うVCスキーマ識別子の配列
+          type: array
+          items:
+            type: string
+      required:
+        - vcSchemaIds
+    ConnectDidInfosDto:
+      type: object
+      properties:
+        didInfoIds:
+          example:
+            - 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: (必須) グループに紐付けを行うDID情報の識別子の配列
+          type: array
+          items:
+            type: string
+      required:
+        - didInfoIds
+    ConnectVcInfosDto:
+      type: object
+      properties:
+        vcInfoIds:
+          example:
+            - 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: (必須) グループに紐付けを行うVC情報の識別子の配列
+          type: array
+          items:
+            type: string
+      required:
+        - vcInfoIds
+    ConnectVpInfosDto:
+      type: object
+      properties:
+        vpInfoIds:
+          example:
+            - 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: (必須) グループに紐付けを行うVP情報の識別子の配列
+          type: array
+          items:
+            type: string
+      required:
+        - vpInfoIds
+    VcInfosResponseDto:
+      type: object
+      properties:
+        items:
+          description: Array of VC info items
+          type: array
+          items:
+            $ref: '#/components/schemas/VcInfo'
+        meta:
+          $ref: '#/components/schemas/MetaDto'
+        links:
+          $ref: '#/components/schemas/LinkDto'
+      required:
+        - items
+        - meta
+        - links
+    CreateVcInfoDto:
+      type: object
+      properties:
+        issuer:
+          type: string
+          example: did:key:z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP
+          description: >-
+            (必須)
+            VCの発行者の識別子として用いる文字列の値。現在はDIDのみがサポートされていますが、今後のアップデートでDID以外の文字列をサポートする予定です。
+        vcSchemaId:
+          type: string
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: (必須) 新規発行するVCの元となるVCスキーマの識別子
+        credentialSubject:
+          type: object
+          example:
+            age: 20
+            name: test
+          description: (必須) VCの主張内容(クレーム)となる値のオブジェクト型の値
+        label:
+          type: string
+          example: vc-for-project1
+          description: >-
+            (任意) VCの識別や整理などの管理するにあったてメタデータとして任意で設定可能な単語のフレーズ。(例:
+            vc-for-project1)
+        description:
+          type: string
+          example: This is the description of VC
+          description: (任意) VCの発行目的や用途など任意で設定可能な説明文
+      required:
+        - issuer
+        - vcSchemaId
+        - credentialSubject
+    VcInfoResponseDto:
+      type: object
+      properties:
+        vcInfo:
+          example:
+            id: dcb884cb-bf93-437d-906b-67fb893dea98
+            hash: Qma1dK93xnJpyuSeQcFiq6JC5LANRTBegE3EUN79udbCcv
+            description: ''
+            createdBy:
+              id: e8973f1a-a80f-4243-8061-144565b640f2
+              name: admin
+              email: admin@email.com
+              needActivateFlow: false
+              status: active
+              role: admin
+              createdAt: '2025-02-04T22:32:21.343Z'
+              updatedAt: '2025-02-04T22:32:21.343Z'
+            vcSchema:
+              id: fc765af3-63da-4030-9c2d-3c6b44ae283d
+              title: hogeVC
+              version: 1.0.0
+              description: ''
+              createdAt: '2024-10-18T04:17:56.564Z'
+              updatedAt: '2024-10-18T04:17:56.564Z'
+            user: null
+            vpInfos: []
+            groups: []
+            badge: null
+            verifications: []
+            createdAt: '2024-07-09T04:37:14.248Z'
+            updatedAt: '2024-07-09T04:37:14.248Z'
+          description: 本アプリケーションにおけるVCの管理情報
+          allOf:
+            - $ref: '#/components/schemas/VcInfo'
+        vcObject:
+          type: object
+          example:
+            credentialSubject:
+              age: 20
+              name: test
+            issuer:
+              id: >-
+                did:ethr:0x030a48b2e2c4890ff2c26b91b93f8f899191c21bd6d52722e62a5251c55dfa22a5
+            type:
+              - VerifiableCredential
+            '@context':
+              - https://www.w3.org/2018/credentials/v1
+            issuanceDate: '2024-07-09T04:37:14.000Z'
+            proof:
+              type: JwtProof2020
+              jwt: >-
+                eyJhbGciOiJFUzI1NksiLCJ0eXAiOiJKV1QifQ.eyJ2YyI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImFnZSI6MjAsIm5hbWUiOiJ0ZXN0In19LCJuYmYiOjE3MjA0OTk4MzQsImlzcyI6ImRpZDpldGhyOjB4MDMwYTQ4YjJlMmM0ODkwZmYyYzI2YjkxYjkzZjhmODk5MTkxYzIxYmQ2ZDUyNzIyZTYyYTUyNTFjNTVkZmEyMmE1In0.1nRHUig219PlBaUDjWUW7h-63C1owP0Qd_epijgLaftlS-XyIafO2KHQQbBF_x2t1-nB49rW1DlhpItkV-Dmmi
+          description: VCのJSONデータ
+      required:
+        - vcInfo
+        - vcObject
+    IssueVcInfoDto:
+      type: object
+      properties:
+        issuer:
+          type: string
+          example: did:key:z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP
+          description: >-
+            (必須)
+            VCの発行者の識別子として用いる文字列の値。現在はDIDのみがサポートされていますが、今後のアップデートでDID以外の文字列をサポートする予定です。
+        credentialSubject:
+          type: object
+          example:
+            age: 20
+            name: test
+          description: (必須) VCの主張内容(クレーム)となる値のオブジェクト型の値
+        label:
+          type: string
+          example: vc-for-project1
+          description: >-
+            (任意) VCの識別や整理などの管理するにあったてメタデータとして任意で設定可能な単語のフレーズ。(例:
+            vc-for-project1)
+        description:
+          type: string
+          example: This is the description of VC
+          description: (任意) VCの発行目的や用途など任意で設定可能な説明文
+      required:
+        - issuer
+        - credentialSubject
+    UploadVCDto:
+      type: object
+      properties:
+        credentialObject:
+          type: object
+          example:
+            credentialSubject:
+              age: 20
+              name: test
+            issuer:
+              id: >-
+                did:ethr:0x030a48b2e2c4890ff2c26b91b93f8f899191c21bd6d52722e62a5251c55dfa22a5
+            type:
+              - VerifiableCredential
+            '@context':
+              - https://www.w3.org/2018/credentials/v1
+            issuanceDate: '2024-07-09T04:37:14.000Z'
+            proof:
+              type: JwtProof2020
+              jwt: >-
+                eyJhbGciOiJFUzI1NksiLCJ0eXAiOiJKV1QifQ.eyJ2YyI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImFnZSI6MjAsIm5hbWUiOiJ0ZXN0In19LCJuYmYiOjE3MjA0OTk4MzQsImlzcyI6ImRpZDpldGhyOjB4MDMwYTQ4YjJlMmM0ODkwZmYyYzI2YjkxYjkzZjhmODk5MTkxYzIxYmQ2ZDUyNzIyZTYyYTUyNTFjNTVkZmEyMmE1In0.1nRHUig219PlBaUDjWUW7h-63C1owP0Qd_epijgLaftlS-XyIafO2KHQQbBF_x2t1-nB49rW1DlhpItkV-Dmmi
+          description: (任意) JSON形式のVCオブジェクト。ファイルアップロードではなくテキストを用いて作成する場合のみ必須
+        label:
+          type: string
+          example: vc-for-project1
+          description: >-
+            (任意) VCの識別や整理などの管理するにあったてメタデータとして任意で設定可能な単語のフレーズ。(例:
+            vc-for-project1)
+        description:
+          type: string
+          example: This is the description of VC
+          description: (任意) VCの発行目的や用途など任意で設定可能な説明文。
+    AddLabelToVcInfoDto:
+      type: object
+      properties:
+        label:
+          type: string
+          example: vc-for-project1
+          description: >-
+            (必須) VCの識別や整理などの管理するにあったてメタデータとして任意で設定可能な単語のフレーズ。(例:
+            vc-for-project1)
+      required:
+        - label
+    UpdateVcInfoDto:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: (必須) VC情報を紐づけるアカウントの識別子
+      required:
+        - userId
+    GenerateVpDto:
+      type: object
+      properties:
+        didInfoId:
+          type: string
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: (必須) VPを生成する際にVCに対しての署名に用いるDIDの識別子
+      required:
+        - didInfoId
+    DidInfosResponseDto:
+      type: object
+      properties:
+        items:
+          example:
+            - id: bde07fae-69de-44c4-bb87-1763c2058b56
+              manageUuid: 32bad62a-4186-4d04-a26a-fcee79d5824b
+              did: did:key:z6MkhGeGj7u5htkCYjE4PaQ8HUqjYyTmxpDb6Q1MqUpUDsN7
+              method: key
+              label: did-for-project1
+              domainName: ''
+              existPrivateKey: true
+              description: This is the description of did
+              createdAt: '2024-10-17T03:32:38.901Z'
+              updatedAt: '2024-10-17T03:32:38.901Z'
+          description: Array of DID info items
+          type: array
+          items:
+            $ref: '#/components/schemas/DidInfo'
+        meta:
+          $ref: '#/components/schemas/MetaDto'
+        links:
+          $ref: '#/components/schemas/LinkDto'
+      required:
+        - items
+        - meta
+        - links
+    CreateDidDto:
+      type: object
+      properties:
+        didMethod:
+          type: string
+          example: key
+          description: >-
+            (必須) 新規生成するDIDのメソッド。(現在対応するDIDメソッド: "key", "ether", "ethr:sepolia",
+            "ethr:arbitrum:goerli", "web")
+        label:
+          type: string
+          example: did-for-project1
+          description: >-
+            (任意) DIDの識別や整理などの管理するにあったてメタデータとして任意で設定可能な単語のフレーズ。(例:
+            did-for-project1)
+        domainName:
+          type: string
+          example: domain-name.com
+          description: >-
+            (任意)
+            did:webメソッドでDIDを生成する際に必要なドメイン名。DIDによって指定されたドメインがドメインネームシステム(DNS)を通じて解決されるときのホスト名。did:webメソッド以外では必要のないパラメータなため任意の項目である。
+        description:
+          type: string
+          example: DIDの生成目的や用途など任意で設定可能な説明文。
+          description: (任意) DIDの生成目的や用途など任意で設定可能な説明文。
+      required:
+        - didMethod
+    RegisterDidDto:
+      type: object
+      properties:
+        did:
+          type: string
+          example: did:key:z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP
+          description: '(必須) '
+        label:
+          type: string
+          example: did-for-project1
+          description: >-
+            (任意) DIDの識別や整理などの管理するにあったてメタデータとして任意で設定可能な単語のフレーズ。(例:
+            did-for-project1)
+        description:
+          type: string
+          example: This is the description of did
+          description: (任意) DIDの生成目的や用途など任意で設定可能な説明文。
+      required:
+        - did
+    DidInfoResponseDto:
+      type: object
+      properties:
+        didInfo:
+          example:
+            id: bde07fae-69de-44c4-bb87-1763c2058b56
+            manageUuid: 32bad62a-4186-4d04-a26a-fcee79d5824b
+            did: did:key:z6MkhGeGj7u5htkCYjE4PaQ8HUqjYyTmxpDb6Q1MqUpUDsN7
+            method: key
+            label: did-for-project1
+            domainName: ''
+            existPrivateKey: true
+            description: This is the description of did
+            user: null
+            createdBy: null
+            createdAt: '2024-10-17T03:32:38.901Z'
+            updatedAt: '2024-10-17T03:32:38.901Z'
+          description: ''
+          allOf:
+            - $ref: '#/components/schemas/DidInfo'
+        didObject:
+          type: object
+          example:
+            id: >-
+              did:ethr:0x030a48b2e2c4890ff2c26b91b93f8f899191c21bd6d52722e62a5251c55dfa22a5
+            verificationMethod:
+              - id: >-
+                  did:ethr:0x030a48b2e2c4890ff2c26b91b93f8f899191c21bd6d52722e62a5251c55dfa22a5#controller
+                type: EcdsaSecp256k1RecoveryMethod2020
+                controller: >-
+                  did:ethr:0x030a48b2e2c4890ff2c26b91b93f8f899191c21bd6d52722e62a5251c55dfa22a5
+                blockchainAccountId: eip155:1:0x28DA61f78488BFa22acFcB25675af265835e8aF8
+              - id: >-
+                  did:ethr:0x030a48b2e2c4890ff2c26b91b93f8f899191c21bd6d52722e62a5251c55dfa22a5#controllerKey
+                type: EcdsaSecp256k1VerificationKey2019
+                controller: >-
+                  did:ethr:0x030a48b2e2c4890ff2c26b91b93f8f899191c21bd6d52722e62a5251c55dfa22a5
+                publicKeyHex: >-
+                  030a48b2e2c4890ff2c26b91b93f8f899191c21bd6d52722e62a5251c55dfa22a5
+            authentication:
+              - >-
+                did:ethr:0x030a48b2e2c4890ff2c26b91b93f8f899191c21bd6d52722e62a5251c55dfa22a5#controller
+              - >-
+                did:ethr:0x030a48b2e2c4890ff2c26b91b93f8f899191c21bd6d52722e62a5251c55dfa22a5#controllerKey
+            assertionMethod:
+              - >-
+                did:ethr:0x030a48b2e2c4890ff2c26b91b93f8f899191c21bd6d52722e62a5251c55dfa22a5#controller
+              - >-
+                did:ethr:0x030a48b2e2c4890ff2c26b91b93f8f899191c21bd6d52722e62a5251c55dfa22a5#controllerKey
+            '@context':
+              - https://www.w3.org/ns/did/v1
+              - https://w3id.org/security/suites/secp256k1recovery-2020/v2
+              - https://w3id.org/security/v3-unstable
+          description: ''
+      required:
+        - didInfo
+        - didObject
+    AddLabelToDidInfoDto:
+      type: object
+      properties:
+        label:
+          type: string
+          example: did-for-project1
+          description: >-
+            (必須) DIDの識別や整理などの管理するにあったてメタデータとして任意で設定可能な単語のフレーズ。(例:
+            did-for-project1)
+      required:
+        - label
+    ResolveDidDto:
+      type: object
+      properties:
+        did:
+          type: string
+          example: did:key:z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP
+          description: (必須) 解決を実施するDID文字列。
+      required:
+        - did
+    ResolveDidResponseDto:
+      type: object
+      properties:
+        context:
+          example:
+            - https://www.w3.org/ns/did/v1
+            - https://w3id.org/security/suites/ed25519-2018/v1
+            - https://w3id.org/security/suites/x25519-2019/v1
+          description: ''
+          type: array
+          items:
+            type: string
+        id:
+          type: string
+          example: did:key:z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP
+          description: ''
+        verificationMethod:
+          example:
+            - id: >-
+                did:key:z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP#z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP
+              type: Ed25519VerificationKey2018
+              controller: did:key:z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP
+              publicKeyBase58: NFSaVHowNyAZAcucjePAmkKWidMEniVF67hZXfo3651
+            - id: >-
+                did:key:z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP#z6LShmgtsCTMEhTZ9gKNkCrcW754zWswWSB5FwdF1KiCSwSt
+              type: X25519KeyAgreementKey2019
+              controller: did:key:z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP
+              publicKeyBase58: 76WjLteV9Ejp4HwcDZLfBWrb9NLpopzvNxuZWs4fjZg8
+          description: ''
+          type: array
+          items:
+            type: object
+        assertionMethod:
+          example:
+            - >-
+              did:key:z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP#z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP
+          description: ''
+          type: array
+          items:
+            type: string
+        authentication:
+          example:
+            - >-
+              did:key:z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP#z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP
+          description: ''
+          type: array
+          items:
+            type: string
+        capabilityInvocation:
+          example:
+            - >-
+              did:key:z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP#z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP
+          description: ''
+          type: array
+          items:
+            type: string
+        capabilityDelegation:
+          example:
+            - >-
+              did:key:z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP#z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP
+          description: ''
+          type: array
+          items:
+            type: string
+        keyAgreement:
+          example:
+            - >-
+              did:key:z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP#z6LShmgtsCTMEhTZ9gKNkCrcW754zWswWSB5FwdF1KiCSwSt
+          description: ''
+          type: array
+          items:
+            type: string
+      required:
+        - context
+        - id
+        - verificationMethod
+        - assertionMethod
+        - authentication
+        - capabilityInvocation
+        - capabilityDelegation
+        - keyAgreement
+    MailsResponseDto:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Mail'
+        meta:
+          $ref: '#/components/schemas/MetaDto'
+        links:
+          $ref: '#/components/schemas/LinkDto'
+      required:
+        - items
+        - meta
+        - links
+    SendMailDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: '[iDroit Dashboard] News'
+          description: (必須) メールの件名
+        content:
+          type: string
+          example: This is the mail content.
+          description: (必須) メールの内容
+        userId:
+          type: string
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: (任意) メールの送信対象のユーザーアカウント識別子
+      required:
+        - title
+        - content
+    SendMailBatchDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: '[iDroit Dashboard] News'
+          description: (必須) メールの件名
+        forEveryClient:
+          type: boolean
+          example: false
+          description: >-
+            (必須) 全てのクライアントアカウントに対して送信するか (true: 全てのクライアントアカウントに送信, false:
+            全てのクライアントアカウントに送信しない)
+        forEveryUser:
+          type: boolean
+          example: false
+          description: >-
+            (必須) 全てのユーザーアカウントに対して送信するか (true: 全てのユーザーアカウントに送信, false:
+            全てのユーザーアカウントに送信しない)
+        userIds:
+          example:
+            - 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: (任意) メールの送信対象のユーザーアカウント識別子の配列
+          type: array
+          items:
+            type: string
+        groupIds:
+          example:
+            - 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: >-
+            (任意)
+            送信対象のグループ識別子の配列。グループを指定した場合グループに紐付くユーザーアカウントとクライアントアカウント全てにメールが送信される
+          type: array
+          items:
+            type: string
+        content:
+          type: string
+          example: This is the mail content.
+          description: (必須) メールの内容
+      required:
+        - title
+        - forEveryClient
+        - forEveryUser
+        - content
+    VcSchemasResponseDto:
+      type: object
+      properties:
+        items:
+          example:
+            - id: fc765af3-63da-4030-9c2d-3c6b44ae283d
+              title: hogeVC
+              version: 1.0.0
+              vcInfos:
+                - id: 41e840da-ec7a-4c9b-8783-9b4160719bea
+                  label: cdsd
+                  hash: QmSfRENacd2K2kbjYzPSxRKThZpYio4yX1Xb9MMnSxxZKu
+                  description: null
+                  createdAt: '2024-10-18T04:18:18.191Z'
+                  updatedAt: '2024-10-18T04:18:18.191Z'
+              vcSchemaProperties:
+                - id: 98164eb2-6650-4198-813a-cc9e11c221dd
+                  propIndex: 2
+                  propName: age
+                  propType: number
+                  parentObjectIndex: null
+                  createdAt: '2024-10-18T04:17:56.585Z'
+                  updatedAt: '2024-10-18T04:17:56.585Z'
+                - id: 866154a6-e0ba-4caa-aaec-4d923f55cb4a
+                  propIndex: 1
+                  propName: name
+                  propType: string
+                  parentObjectIndex: null
+                  createdAt: '2024-10-18T04:17:56.584Z'
+                  updatedAt: '2024-10-18T04:17:56.584Z'
+              groups:
+                - id: 123e4567-e89b-12d3-a456-426614174000
+                  name: Project Group 1
+                  status: active
+                  description: This is Project Group 1.
+                  createdAt: '2024-05-24T06:39:54.352Z'
+                  updatedAt: '2024-05-24T06:39:54.352Z'
+              createdAt: '2024-10-18T04:17:56.564Z'
+              updatedAt: '2024-10-18T04:17:56.564Z'
+          description: Array of VC schema items
+          type: array
+          items:
+            $ref: '#/components/schemas/VcSchema'
+        meta:
+          $ref: '#/components/schemas/MetaDto'
+        links:
+          $ref: '#/components/schemas/LinkDto'
+      required:
+        - items
+        - meta
+        - links
+    CreateVcSchemaDto:
+      type: object
+      properties:
+        title:
+          type: string
+          example: VC Schema sample
+          description: (必須) 新規生成するVCスキーマのタイトル
+        version:
+          type: string
+          example: 1.0.0
+          description: '(必須) VCスキーマのバージョン(デフォルト: 1.0.0)'
+        contexts:
+          example:
+            - https://www.w3.org/ns/credentials/v2
+            - https://purl.imsglobal.org/spec/ob/v3p0/context-3.0.3.json
+            - https://purl.imsglobal.org/spec/ob/v3p0/extensions.json
+          description: (任意) VCスキーマに設定する@context文字列の配列
+          type: array
+          items:
+            type: string
+        description:
+          type: string
+          example: This is the description of did
+          description: (任意) VCスキーマの説明文
+        isBadgeSchema:
+          type: boolean
+          example: false
+          description: '(任意) このスキーマがバッジのスキーマか否か(デフォルト: false)'
+        fileId:
+          type: string
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: >-
+            (任意)
+            バッジの画像のファイル識別子。'`isBadgeSchema`プロパティが`true`であり、バッジスキーマとして利用する場合は必須のパラメータ。
+        propArray:
+          example:
+            - propIndex: 1
+              propName: id
+              propType: string
+              parentObjectIndex: null
+            - propIndex: 2
+              propName: status
+              propType: object
+              parentObjectIndex: null
+            - propIndex: 3
+              propName: age
+              propType: number
+              parentObjectIndex: 2
+            - propIndex: 4
+              propName: isActive
+              propType: boolean
+              parentObjectIndex: 2
+            - propIndex: 5
+              propName: hogeArray
+              propType: array:string
+              parentObjectIndex: null
+          description: (必須) VCのスキーマの各項目における項目名と項目型のオブジェクトの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VcSchemaProperty'
+      required:
+        - title
+        - version
+        - isBadgeSchema
+        - fileId
+        - propArray
+    VcSchemaResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: VCスキーマの識別子
+        title:
+          type: string
+          example: This is VC Schema sample 1
+          description: VCスキーマのタイトル
+        version:
+          type: string
+          example: 1.0.0
+          description: VCスキーマのバージョン
+        description:
+          type: string
+          example: This is VC Schema 1.
+          description: VCスキーマの説明文
+        isBadgeSchema:
+          type: string
+          example: false
+          description: VCスキーマがバッジのスキーマか否か
+        vcInfos:
+          example:
+            - id: 123e4567-e89b-12d3-a456-426614174000
+              label: vc-info-1
+              hash: 11bf5b37-e0b8-42e0-8dcf-dc8c4aefc000
+              description: This is Project Group 1.
+              createdAt: '2024-05-24T06:39:54.352Z'
+              updatedAt: '2024-05-24T06:39:54.352Z'
+          description: ''
+          type: array
+          items:
+            $ref: '#/components/schemas/VcInfo'
+        vcContexts:
+          example: []
+          description: VCのスキーマのJSONスキーマコンテキスト
+          type: array
+          items:
+            $ref: '#/components/schemas/VcContext'
+        vcSchemaProperties:
+          example:
+            - id: 53d624fb-456b-4500-8673-d53dc672bbeb
+              propName: age
+              propType: number
+              createdAt: '2024-07-09T04:25:19.878Z'
+              updatedAt: '2024-07-09T04:25:19.878Z'
+            - id: 576a7023-141c-4dea-8d8c-b1162b7f5963
+              propName: name
+              propType: string
+              createdAt: '2024-07-09T04:25:19.877Z'
+              updatedAt: '2024-07-09T04:25:19.877Z'
+          description: VCのスキーマの各項目における項目名と項目型のオブジェクトの配列
+          type: array
+          items:
+            $ref: '#/components/schemas/VcSchemaProperty'
+        groups:
+          example:
+            - id: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+              name: Group A
+              description: This is Group A for Project X.
+              createdAt: '2024-05-24T07:37:04.273Z'
+              updatedAt: '2024-05-24T07:37:18.000Z'
+          description: ''
+          type: array
+          items:
+            $ref: '#/components/schemas/Group'
+        badges:
+          description: VCスキーマを紐付けたバッジ
+          type: array
+          items:
+            $ref: '#/components/schemas/Badge'
+        file:
+          description: VCスキーマに紐付けるバッジ用の画像。`isBadgeSchema`プロパティが`true`の場合必須。
+          allOf:
+            - $ref: '#/components/schemas/File'
+        createdBy:
+          example:
+            id: e8973f1a-a80f-4243-8061-144565b640f2
+            name: admin
+            email: admin@email.com
+            needActivateFlow: false
+            status: active
+            role: admin
+            createdAt: '2025-02-04T22:32:21.343Z'
+            updatedAt: '2025-02-04T22:32:21.343Z'
+          description: VCスキーマを作成したユーザーアカウント
+          allOf:
+            - $ref: '#/components/schemas/User'
+        createdAt:
+          type: string
+          example: '2024-05-24T06:39:54.352Z'
+          description: VCスキーマの作成日時
+        updatedAt:
+          type: string
+          example: '2024-05-24T06:39:54.352Z'
+          description: VCスキーマの最終更新日時
+      required:
+        - id
+        - title
+        - version
+        - description
+        - isBadgeSchema
+        - vcInfos
+        - vcContexts
+        - vcSchemaProperties
+        - groups
+        - badges
+        - file
+        - createdBy
+        - createdAt
+        - updatedAt
+    UpdateVcSchemaDto:
+      type: object
+      properties:
+        groupIds:
+          example:
+            - 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: (必須) VCスキーマを紐づけるグループ識別子の配列。
+          type: array
+          items:
+            type: string
+        contexts:
+          example:
+            - https://www.w3.org/ns/credentials/v2
+            - https://purl.imsglobal.org/spec/ob/v3p0/context-3.0.3.json
+            - https://purl.imsglobal.org/spec/ob/v3p0/extensions.json
+          description: (必須) VCスキーマを紐づけるcontext項目の配列。
+          type: array
+          items:
+            type: string
+    FilesResponseDto:
+      type: object
+      properties:
+        items:
+          description: Array of file items
+          type: array
+          items:
+            $ref: '#/components/schemas/File'
+        meta:
+          $ref: '#/components/schemas/MetaDto'
+        links:
+          $ref: '#/components/schemas/LinkDto'
+      required:
+        - items
+        - meta
+        - links
+    FileResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: (必須) ファイルの識別子
+        filename:
+          type: string
+          example: sample_file
+          description: (必須) システム内で管理される際にシステムによって名付けられるユニークなファイル名
+        originalname:
+          type: string
+          example: sample_file
+          description: (必須) システム内で管理される際にシステムによって名付けられるユニークなファイル名
+        fileData:
+          type: string
+          example: text/csv:nfhorif2Efr2
+          description: (必須) システムへアップロード時の元のファイル名
+        fileType:
+          type: string
+          example: text/csv
+          description: (必須) ファイル形式
+        type:
+          type: string
+          example: image/png
+          description: (必須) ファイル形式
+        executed:
+          type: boolean
+          example: false
+          description: '(任意) ファイルがCSVの場合、アカウントデータ生成実行に使用されたか。(true: 実行済み, false: 未使用)'
+        status:
+          type: number
+          example: 0
+          description: (必須) ファイルのステータス
+        createdBy:
+          example:
+            id: e8973f1a-a80f-4243-8061-144565b640f2
+            name: admin
+            email: admin@email.com
+            needActivateFlow: false
+            status: active
+            role: admin
+            createdAt: '2025-02-04T22:32:21.343Z'
+            updatedAt: '2025-02-04T22:32:21.343Z'
+          description: ファイルをアップロードしたユーザーアカウント
+          allOf:
+            - $ref: '#/components/schemas/User'
+        createdAt:
+          type: string
+          example: '2024-05-24T06:39:54.352Z'
+          description: (必須) ファイルの作成日時
+        updatedAt:
+          type: string
+          example: '2024-05-24T06:39:54.352Z'
+          description: (必須) グループの最終更新日時
+      required:
+        - id
+        - filename
+        - originalname
+        - fileData
+        - fileType
+        - type
+        - executed
+        - status
+        - createdBy
+        - createdAt
+        - updatedAt
+    VpInfoResponseDto:
+      type: object
+      properties:
+        items:
+          example:
+            - id: dcb884cb-bf93-437d-906b-67fb893dea98
+              label: null
+              hash: Qma1dK93xnJpyuSeQcFiq6JC5LANRTBegE3EUN79udbCcv
+              description: ''
+              createdAt: '2024-07-09T04:37:14.248Z'
+              updatedAt: '2024-07-09T04:37:14.248Z'
+              raw: '{"hoge":"a"...'
+          description: ''
+          type: array
+          items:
+            $ref: '#/components/schemas/VpInfo'
+        meta:
+          $ref: '#/components/schemas/MetaDto'
+        links:
+          $ref: '#/components/schemas/LinkDto'
+      required:
+        - items
+        - meta
+        - links
+    CreateVpInfoDto:
+      type: object
+      properties:
+        vcInfoIds:
+          example:
+            - 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: (必須) VPを生成する元となるVC情報の識別子の配列
+          type: array
+          items:
+            type: string
+        didInfoId:
+          type: string
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: (必須) VP生成時の署名に用いるDID情報の識別子
+        label:
+          type: string
+          example: vp-for-project1
+          description: >-
+            (任意) VPの識別や整理などの管理するにあったてメタデータとして任意で設定可能な単語のフレーズ。(例:
+            vc-for-project1)
+        description:
+          type: string
+          example: This is the description of did
+          description: (任意) VPの生成目的や用途などを任意で設定可能な説明文
+      required:
+        - vcInfoIds
+        - didInfoId
+    UploadVPDto:
+      type: object
+      properties:
+        credentialObject:
+          type: object
+          example:
+            credentialSubject:
+              age: 20
+              name: test
+            issuer:
+              id: >-
+                did:ethr:0x030a48b2e2c4890ff2c26b91b93f8f899191c21bd6d52722e62a5251c55dfa22a5
+            type:
+              - VerifiableCredential
+            '@context':
+              - https://www.w3.org/2018/credentials/v1
+            issuanceDate: '2024-07-09T04:37:14.000Z'
+            proof:
+              type: JwtProof2020
+              jwt: >-
+                eyJhbGciOiJFUzI1NksiLCJ0eXAiOiJKV1QifQ.eyJ2YyI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImFnZSI6MjAsIm5hbWUiOiJ0ZXN0In19LCJuYmYiOjE3MjA0OTk4MzQsImlzcyI6ImRpZDpldGhyOjB4MDMwYTQ4YjJlMmM0ODkwZmYyYzI2YjkxYjkzZjhmODk5MTkxYzIxYmQ2ZDUyNzIyZTYyYTUyNTFjNTVkZmEyMmE1In0.1nRHUig219PlBaUDjWUW7h-63C1owP0Qd_epijgLaftlS-XyIafO2KHQQbBF_x2t1-nB49rW1DlhpItkV-Dmmi
+          description: (任意) JSON形式のVPオブジェクト。ファイルアップロードではなくテキストを用いて作成する場合のみ必須
+        label:
+          type: string
+          example: vp-for-project1
+          description: >-
+            (任意) VPの識別や整理などの管理するにあったてメタデータとして任意で設定可能な単語のフレーズ。(例:
+            vc-for-project1)
+        description:
+          type: string
+          example: This is the description of VP
+          description: (任意) VPの発行目的や用途など任意で設定可能な説明文。
+    VpInfoDetailDto:
+      type: object
+      properties:
+        vpInfo:
+          example:
+            id: dcb884cb-bf93-437d-906b-67fb893dea98
+            label: null
+            hash: Qma1dK93xnJpyuSeQcFiq6JC5LANRTBegE3EUN79udbCcv
+            description: ''
+            raw: '{"hoge":"a"...'
+            createdBy:
+              id: e8973f1a-a80f-4243-8061-144565b640f2
+              name: admin
+              email: admin@email.com
+              needActivateFlow: false
+              status: active
+              role: admin
+              createdAt: '2025-02-04T22:32:21.343Z'
+              updatedAt: '2025-02-04T22:32:21.343Z'
+            user: null
+            vcInfos: []
+            groups: []
+            didInfos: []
+            verifications: []
+            createdAt: '2024-07-09T04:37:14.248Z'
+            updatedAt: '2024-07-09T04:37:14.248Z'
+          description: VP情報
+          allOf:
+            - $ref: '#/components/schemas/VpInfo'
+        vpObject:
+          type: object
+      required:
+        - vpInfo
+        - vpObject
+    AddLabelToVpInfoDto:
+      type: object
+      properties:
+        label:
+          type: string
+          example: v p-for-project1
+          description: >-
+            (必須) VPの識別や整理などの管理するにあったてメタデータとして任意で設定可能な単語のフレーズ。(例:
+            vp-for-project1)
+      required:
+        - label
+    VerificationsResponseDto:
+      type: object
+      properties:
+        items:
+          example:
+            - id: dcb884cb-bf93-437d-906b-67fb893dea98
+              label: verification-1
+              result: true
+              createdBy:
+                id: e8973f1a-a80f-4243-8061-144565b640f2
+                name: admin
+                email: admin@email.com
+                needActivateFlow: false
+                status: active
+                role: admin
+                createdAt: '2025-02-04T22:32:21.343Z'
+                updatedAt: '2025-02-04T22:32:21.343Z'
+              vcInfo:
+                - id: dcb884cb-bf93-437d-906b-67fb893dea98
+                  label: vc-for-project1
+                  hash: Qma1dK93xnJpyuSeQcFiq6JC5LANRTBegE3EUN79udbCcv
+                  description: ''
+                  createdAt: '2024-07-09T04:37:14.248Z'
+                  updatedAt: '2024-07-09T04:37:14.248Z'
+              vpInfo: []
+              createdAt: '2024-07-09T04:37:14.248Z'
+              updatedAt: '2024-07-09T04:37:14.248Z'
+          description: ''
+          type: array
+          items:
+            $ref: '#/components/schemas/Verification'
+        meta:
+          example:
+            totalItems: 1
+            itemCount: 1
+            itemsPerPage: 10
+            totalPages: null
+            currentPage: 1
+          description: ''
+          allOf:
+            - $ref: '#/components/schemas/MetaDto'
+        links:
+          example:
+            first: https://api.idroit-dashboard.com/vc-infos?limit=0
+            previous: 10
+            next: https://api.idroit-dashboard.com/vc-infos?page=2&limit=0
+            last: https://api.idroit-dashboard.com/vc-infos?page=Infinity&limit=0
+          description: ''
+          allOf:
+            - $ref: '#/components/schemas/LinkDto'
+      required:
+        - items
+        - meta
+        - links
+    VerificationDto:
+      type: object
+      properties:
+        label:
+          type: string
+          example: verify-for-check
+          description: >-
+            (必須) 検証結果の識別や整理などの管理するにあったてメタデータとして任意で設定可能な単語のフレーズ。(例:
+            verify-for-check)
+        vcInfoId:
+          type: string
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: (任意) 検証を実行するVC情報の識別子。VC情報の識別子を指定して検証を実行する場合は必須。
+        vpInfoId:
+          type: string
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: (任意) 検証を実行するVP情報の識別子。VP情報の識別子を指定して検証を実行する場合は必須。
+        vcObject:
+          type: object
+          example:
+            credentialSubject:
+              age: 20
+              name: test
+            issuer:
+              id: >-
+                did:ethr:0x030a48b2e2c4890ff2c26b91b93f8f899191c21bd6d52722e62a5251c55dfa22a5
+            type:
+              - VerifiableCredential
+            '@context':
+              - https://www.w3.org/2018/credentials/v1
+            issuanceDate: '2024-07-09T04:37:14.000Z'
+            proof:
+              type: JwtProof2020
+              jwt: >-
+                eyJhbGciOiJFUzI1NksiLCJ0eXAiOiJKV1QifQ.eyJ2YyI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImFnZSI6MjAsIm5hbWUiOiJ0ZXN0In19LCJuYmYiOjE3MjA0OTk4MzQsImlzcyI6ImRpZDpldGhyOjB4MDMwYTQ4YjJlMmM0ODkwZmYyYzI2YjkxYjkzZjhmODk5MTkxYzIxYmQ2ZDUyNzIyZTYyYTUyNTFjNTVkZmEyMmE1In0.1nRHUig219PlBaUDjWUW7h-63C1owP0Qd_epijgLaftlS-XyIafO2KHQQbBF_x2t1-nB49rW1DlhpItkV-Dmmi
+          description: (任意) 検証を実行するVCのJSONテキストデータ。VCのJSONテキストデータを入力して検証を実行する場合は必須。
+        vpObject:
+          type: object
+          example:
+            credentialSubject:
+              age: 20
+              name: test
+            issuer:
+              id: >-
+                did:ethr:0x030a48b2e2c4890ff2c26b91b93f8f899191c21bd6d52722e62a5251c55dfa22a5
+            type:
+              - VerifiableCredential
+            '@context':
+              - https://www.w3.org/2018/credentials/v1
+            issuanceDate: '2024-07-09T04:37:14.000Z'
+            proof:
+              type: JwtProof2020
+              jwt: >-
+                eyJhbGciOiJFUzI1NksiLCJ0eXAiOiJKV1QifQ.eyJ2YyI6eyJAY29udGV4dCI6WyJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy92MSJdLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIl0sImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImFnZSI6MjAsIm5hbWUiOiJ0ZXN0In19LCJuYmYiOjE3MjA0OTk4MzQsImlzcyI6ImRpZDpldGhyOjB4MDMwYTQ4YjJlMmM0ODkwZmYyYzI2YjkxYjkzZjhmODk5MTkxYzIxYmQ2ZDUyNzIyZTYyYTUyNTFjNTVkZmEyMmE1In0.1nRHUig219PlBaUDjWUW7h-63C1owP0Qd_epijgLaftlS-XyIafO2KHQQbBF_x2t1-nB49rW1DlhpItkV-Dmmi
+          description: (任意) 検証を実行するVPのJSONテキストデータ。VPのJSONテキストデータを入力して検証を実行する場合は必須。
+    VerificationResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: 検証結果の識別子
+        label:
+          type: string
+          example: This is the description of VP
+          description: '検証結果の識別や整理などの管理するにあったてメタデータとして任意で設定可能な単語のフレーズ。(例: verify-for-check)'
+        result:
+          type: boolean
+          example: true
+          description: '(必須) VC/VPの検証結果(true: 検証に成功, false: 検証に失敗)'
+        createdBy:
+          example:
+            id: e8973f1a-a80f-4243-8061-144565b640f2
+            name: admin
+            email: admin@email.com
+            needActivateFlow: false
+            status: active
+            role: admin
+            createdAt: '2025-02-04T22:32:21.343Z'
+            updatedAt: '2025-02-04T22:32:21.343Z'
+          description: グループを作成したユーザーアカウント
+          allOf:
+            - $ref: '#/components/schemas/User'
+        vcInfo:
+          example:
+            id: dcb884cb-bf93-437d-906b-67fb893dea98
+            title: schema 1_1720499834247
+            hash: Qma1dK93xnJpyuSeQcFiq6JC5LANRTBegE3EUN79udbCcv
+            description: ''
+            user: null
+            createdAt: '2024-07-09T04:37:14.248Z'
+            updatedAt: '2024-07-09T04:37:14.248Z'
+          description: 検証を実行したVC情報の識別子
+          allOf:
+            - $ref: '#/components/schemas/VcInfo'
+        vpInfo:
+          example:
+            id: dcb884cb-bf93-437d-906b-67fb893dea98
+            title: schema 1_1720499834247
+            hash: Qma1dK93xnJpyuSeQcFiq6JC5LANRTBegE3EUN79udbCcv
+            description: ''
+            user: null
+            createdAt: '2024-07-09T04:37:14.248Z'
+            updatedAt: '2024-07-09T04:37:14.248Z'
+          description: 検証を実行したVP情報の識別子
+          allOf:
+            - $ref: '#/components/schemas/VpInfo'
+        createdAt:
+          type: string
+          example: '2024-05-24T06:39:54.352Z'
+          description: 検証実行時の日時
+        updatedAt:
+          type: string
+          example: '2024-05-24T06:39:54.352Z'
+          description: 検証結果の最終更新日
+      required:
+        - id
+        - label
+        - result
+        - createdBy
+        - vcInfo
+        - vpInfo
+        - createdAt
+        - updatedAt
+    SignInDto:
+      type: object
+      properties:
+        email:
+          type: string
+          example: admin@email.com
+          description: (必須) アカウントログインに用いるメールアドレス。
+        password:
+          type: string
+          example: Password1234
+          description: (必須) アカウントログインに用いるパスワード
+      required:
+        - email
+        - password
+    SignInResponseDto:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: jwt.token.hoge
+          description: 認証用のJSON Web Token
+      required:
+        - access_token
+    GetProfileResponseDto:
+      type: object
+      properties:
+        userId:
+          type: string
+          example: 70ceb004-0550-460a-ad40-c31614bb0109
+          description: アカウントの識別子
+        name:
+          type: string
+          example: clinet1
+          description: アカウントの名前
+        email:
+          type: string
+          example: client1@email.com
+          description: アカウントのメールアドレス
+        role:
+          type: string
+          example: client
+          enum:
+            - admin
+            - user
+            - client
+          description: アカウントロール("admin", "user", "client")
+        iat:
+          type: number
+          example: 1737255455
+          description: JWTが発行された日時
+        exp:
+          type: number
+          example: 1737269855
+          description: JWTが失効する日時
+      required:
+        - userId
+        - name
+        - email
+        - role
+        - iat
+        - exp
+    BadgeResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: バッジの識別子
+        label:
+          type: string
+          example: sample-badge-1
+          description: バッジのラベル名
+        filename:
+          type: string
+          example: badge-12345-12345.png
+          description: バッジのファイル名
+        description:
+          type: string
+          example: This is Group A for Project X.
+          description: バッジの作成目的や用途など任意で設定可能な説明文
+        status:
+          type: number
+          example: 1
+          description: 'バッジの状態(1: 利用可, 0: 利用停止中)'
+        vcSchema:
+          example:
+            id: fc765af3-63da-4030-9c2d-3c6b44ae283d
+            title: hogeVC
+            version: 1.0.0
+            vcInfos:
+              - id: 41e840da-ec7a-4c9b-8783-9b4160719bea
+                label: cdsd
+                hash: QmSfRENacd2K2kbjYzPSxRKThZpYio4yX1Xb9MMnSxxZKu
+                description: null
+                createdAt: '2024-10-18T04:18:18.191Z'
+                updatedAt: '2024-10-18T04:18:18.191Z'
+            vcSchemaProperties:
+              - id: 98164eb2-6650-4198-813a-cc9e11c221dd
+                propIndex: 2
+                propName: age
+                propType: number
+                parentObject: null
+                createdAt: '2024-10-18T04:17:56.585Z'
+                updatedAt: '2024-10-18T04:17:56.585Z'
+              - id: 866154a6-e0ba-4caa-aaec-4d923f55cb4a
+                propIndex: 1
+                propName: name
+                propType: string
+                parentObject: null
+                createdAt: '2024-10-18T04:17:56.584Z'
+                updatedAt: '2024-10-18T04:17:56.584Z'
+            groups:
+              - id: 123e4567-e89b-12d3-a456-426614174000
+                name: Project Group 1
+                status: active
+                description: This is Project Group 1.
+                createdAt: '2024-05-24T06:39:54.352Z'
+                updatedAt: '2024-05-24T06:39:54.352Z'
+            createdAt: '2024-10-18T04:17:56.564Z'
+            updatedAt: '2024-10-18T04:17:56.564Z'
+          description: バッジに紐付いたVCスキーマの配列
+          allOf:
+            - $ref: '#/components/schemas/VcSchema'
+        vcInfo:
+          example:
+            id: dcb884cb-bf93-437d-906b-67fb893dea98
+            hash: Qma1dK93xnJpyuSeQcFiq6JC5LANRTBegE3EUN79udbCcv
+            description: ''
+            user: null
+            createdBy: null
+            createdAt: '2024-07-09T04:37:14.248Z'
+            updatedAt: '2024-07-09T04:37:14.248Z'
+          description: バッジに紐付いたVC情報の配列
+          allOf:
+            - $ref: '#/components/schemas/VcInfo'
+        createdAt:
+          type: string
+          example: '2024-05-24T06:39:54.352Z'
+          description: バッジの作成日時
+        updatedAt:
+          type: string
+          example: '2024-05-24T06:39:54.352Z'
+          description: バッジの最終更新日時
+      required:
+        - id
+        - label
+        - filename
+        - description
+        - status
+        - vcSchema
+        - vcInfo
+        - createdAt
+        - updatedAt
+    BadgesResponseDto:
+      type: object
+      properties:
+        items:
+          description: Array of badge items
+          type: array
+          items:
+            $ref: '#/components/schemas/BadgeResponseDto'
+        meta:
+          $ref: '#/components/schemas/MetaDto'
+        links:
+          $ref: '#/components/schemas/LinkDto'
+      required:
+        - items
+        - meta
+        - links
+    CreateBadgeDto:
+      type: object
+      properties:
+        label:
+          type: string
+          example: Sample Badge 1
+          description: (任意) バッジのタイトル
+        description:
+          type: string
+          example: This is Group A for Project X.
+          description: (任意) グループの作成目的や用途など任意で設定可能な説明文
+        issuer:
+          type: string
+          example: did:key:z6MkepWVAjYFGvTdffTcJJcE1sJKLHuCefxqw72dPodoxJrP
+          description: >-
+            (必須)
+            VCの発行者の識別子として用いる文字列の値。現在はDIDのみがサポートされていますが、今後のアップデートでDID以外の文字列をサポートする予定です。
+        credentialSubject:
+          type: object
+          example:
+            age: 20
+            name: test
+          description: (必須) VCの主張内容(クレーム)となる値のオブジェクト型の値
+        vcSchemaId:
+          type: string
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: (必須) 新規発行するVCの元となるVCスキーマの識別子
+      required:
+        - issuer
+        - credentialSubject
+        - vcSchemaId
+    AddLabelToBadgeDto:
+      type: object
+      properties:
+        label:
+          type: string
+          example: badge-for-project1
+          description: >-
+            (必須) Badgeの識別や整理などの管理するにあったてメタデータとして任意で設定可能な単語のフレーズ。(例:
+            badge-for-project1)
+      required:
+        - label
+    VerifyBadgeDto:
+      type: object
+      properties:
+        veriifyVC:
+          type: boolean
+          example: true
+          description: >-
+            (任意)
+            バッジに紐づいたVC情報を検証するか否か。`true`の場合VC情報をfalseの場合`vpInfoId`で指定されたVP情報を検証する
+          default: true
+        vpInfoId:
+          type: string
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: '(任意) '
+          default: false
+      required:
+        - vpInfoId
+    VerifiyBadgeReponseDto:
+      type: object
+      properties:
+        result:
+          type: boolean
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: '(任意) '
+          default: false
+      required:
+        - result
+    VerifiyBadgeFileReponseDto:
+      type: object
+      properties:
+        result:
+          type: boolean
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: '(任意) '
+          default: false
+        filename:
+          type: boolean
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: '(任意) '
+          default: false
+      required:
+        - result
+        - filename
+    Setting:
+      type: object
+      properties: {}
+    SettingListResponseDto:
+      type: object
+      properties:
+        settings:
+          example:
+            - id: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+              key: activateLoginByAdminVC
+              value: false
+              type: boolean
+              createdAt: '2024-05-24T07:37:04.273Z'
+              updatedAt: '2024-05-24T07:37:18.000Z'
+          description: ''
+          type: array
+          items:
+            $ref: '#/components/schemas/Setting'
+      required:
+        - settings
+    SettingResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 3bfc3721-eb7c-4a5b-b5ac-94d1f158911f
+          description: The ID of the user
+        key:
+          type: string
+          example: activateLoginByAdminVC
+          description: setting key name
+        value:
+          type: string
+          example: false
+          description: setting value name
+        type:
+          type: string
+          example: boolean
+          description: string, number or boolean
+      required:
+        - id
+        - key
+        - value
+        - type
